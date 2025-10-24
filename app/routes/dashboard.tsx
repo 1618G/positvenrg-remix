@@ -6,8 +6,12 @@ import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const token = url.searchParams.get("token");
+  // Get token from cookie
+  const cookieHeader = request.headers.get("Cookie");
+  const token = cookieHeader
+    ?.split(";")
+    .find(c => c.trim().startsWith("token="))
+    ?.split("=")[1];
   
   if (!token) {
     return redirect("/login");
