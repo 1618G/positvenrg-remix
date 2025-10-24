@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: positive-energy-remix
+    env: node
+    plan: starter
+    buildCommand: pnpm install && pnpm db:generate && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: positive-nrg-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: ADMIN_EMAIL
+        value: admin@positivenrg.com
+      - key: ADMIN_PASSWORD
+        generateValue: true

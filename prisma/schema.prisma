@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  chats     Chat[]
+  messages  Message[]
+  companions Companion[]
+
+  @@map("users")
+}
+
+model Companion {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  personality String?
+  avatar      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chats       Chat[]
+
+  @@map("companions")
+}
+
+model Chat {
+  id          String   @id @default(cuid())
+  title       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companionId String
+  companion   Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  content   String
+  role      MessageRole
+  createdAt DateTime    @default(now())
+
+  // Relations
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId    String
+  chat      Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
