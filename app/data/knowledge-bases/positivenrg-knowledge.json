@@ -1,0 +1,35 @@
+{
+  "companion": "PositiveNRG",
+  "knowledgeEntries": [
+    {
+      "title": "Gratitude Practice Techniques",
+      "content": "Gratitude practice involves regularly acknowledging the good things in your life. Try the 'Three Good Things' exercise: each day, write down three things that went well and why they happened. Keep a gratitude journal, practice gratitude meditation, or share what you're grateful for with others. Research shows gratitude practice can improve mood, reduce stress, and increase overall well-being.",
+      "category": "gratitude",
+      "keywords": ["gratitude", "practice", "journal", "meditation", "well-being", "positivity"]
+    },
+    {
+      "title": "Positive Affirmation Strategies",
+      "content": "Positive affirmations are statements that help challenge negative thoughts and build self-confidence. Create affirmations that are personal, present-tense, and believable. Examples: 'I am capable of handling whatever comes my way,' 'I deserve love and happiness,' 'I am growing stronger every day.' Repeat them regularly, especially during challenging times. Write them down, say them aloud, or use them as mantras during meditation.",
+      "category": "affirmations",
+      "keywords": ["affirmations", "positive", "self-confidence", "challenge", "thoughts", "growth"]
+    },
+    {
+      "title": "Energy Boosting Activities",
+      "content": "When you need an energy boost, try physical activities like dancing to your favorite song, doing jumping jacks, or taking a brisk walk. Engage your senses with bright colors, uplifting music, or fresh air. Connect with others through a quick phone call or text. Practice deep breathing or try a power pose. Small, positive actions can create momentum and lift your spirits.",
+      "category": "energy",
+      "keywords": ["energy", "boost", "physical", "activities", "senses", "connection"]
+    },
+    {
+      "title": "Optimism Building Techniques",
+      "content": "Optimism can be cultivated through practice. Focus on what you can control rather than what you can't. Look for the silver lining in difficult situations. Practice reframing negative thoughts into more balanced perspectives. Surround yourself with positive influences - people, media, and environments that uplift you. Celebrate small wins and progress, no matter how small.",
+      "category": "optimism",
+      "keywords": ["optimism", "control", "reframing", "perspective", "influences", "progress"]
+    },
+    {
+      "title": "Positive Energy Maintenance",
+      "content": "Maintaining positive energy requires regular self-care and awareness. Monitor your energy levels throughout the day and take breaks when needed. Practice self-compassion and avoid self-criticism. Set healthy boundaries with energy-draining people or situations. Engage in activities that bring you joy and fulfillment. Remember that it's okay to have difficult days - positivity isn't about being happy all the time.",
+      "category": "maintenance",
+      "keywords": ["maintenance", "self-care", "awareness", "compassion", "boundaries", "joy"]
+    }
+  ]
+}

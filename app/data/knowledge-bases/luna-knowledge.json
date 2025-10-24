@@ -1,0 +1,35 @@
+{
+  "companion": "Luna",
+  "knowledgeEntries": [
+    {
+      "title": "Sleep Hygiene Fundamentals",
+      "content": "Good sleep hygiene involves maintaining a consistent sleep schedule, creating a comfortable sleep environment, and establishing a relaxing bedtime routine. Keep your bedroom cool, dark, and quiet. Avoid screens 1 hour before bed, as blue light can interfere with melatonin production. Create a wind-down routine that signals to your body that it's time to sleep.",
+      "category": "sleep_hygiene",
+      "keywords": ["sleep", "hygiene", "routine", "bedtime", "environment", "schedule"]
+    },
+    {
+      "title": "Insomnia Management Techniques",
+      "content": "When you can't sleep, try the 20-minute rule: if you're not asleep after 20 minutes, get out of bed and do something relaxing until you feel sleepy. Avoid checking the time repeatedly, as this can increase anxiety. Practice relaxation techniques like deep breathing or progressive muscle relaxation. Remember that some nights are just harder than others.",
+      "category": "insomnia",
+      "keywords": ["insomnia", "sleep", "anxiety", "relaxation", "techniques", "management"]
+    },
+    {
+      "title": "Bedtime Relaxation Rituals",
+      "content": "Create a personalized bedtime ritual that helps you transition from day to night. This might include gentle stretching, reading a book, journaling, or listening to calming music. The key is consistency - doing the same activities in the same order each night helps signal to your brain that it's time to wind down and prepare for sleep.",
+      "category": "relaxation",
+      "keywords": ["bedtime", "ritual", "relaxation", "routine", "transition", "calming"]
+    },
+    {
+      "title": "Nighttime Anxiety Management",
+      "content": "Nighttime anxiety is common and can be managed through several techniques. Try the 4-7-8 breathing technique: inhale for 4 counts, hold for 7, exhale for 8. Practice grounding exercises like naming 5 things you can see, hear, and feel. Keep a worry journal by your bed to write down concerns, then set them aside until morning.",
+      "category": "anxiety",
+      "keywords": ["anxiety", "nighttime", "breathing", "grounding", "worry", "management"]
+    },
+    {
+      "title": "Sleep Environment Optimization",
+      "content": "Your bedroom should be a sanctuary for sleep. Keep the temperature between 65-68°F (18-20°C). Use blackout curtains or an eye mask to block light. Consider white noise machines or earplugs if you're sensitive to sound. Remove electronic devices and keep the room clean and clutter-free. Your bed should be used primarily for sleep and intimacy.",
+      "category": "environment",
+      "keywords": ["environment", "bedroom", "temperature", "light", "noise", "optimization"]
+    }
+  ]
+}

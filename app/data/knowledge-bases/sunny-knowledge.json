@@ -1,0 +1,35 @@
+{
+  "companion": "Sunny",
+  "knowledgeEntries": [
+    {
+      "title": "Humor Therapy Techniques",
+      "content": "Humor therapy uses laughter and light-heartedness to improve mood and reduce stress. Watch funny videos, read humorous books, or spend time with people who make you laugh. Practice finding the lighter side of situations - look for absurdity or irony in difficult moments. Share jokes or funny stories with others. Remember that laughter releases endorphins and can provide temporary relief from stress and pain.",
+      "category": "humor",
+      "keywords": ["humor", "therapy", "laughter", "mood", "stress", "endorphins"]
+    },
+    {
+      "title": "Lighthearted Activity Ideas",
+      "content": "Engage in activities that bring joy and lightness to your day. Try dancing to upbeat music, playing with pets, or engaging in creative activities like drawing or crafting. Spend time in nature, go for a walk in the sunshine, or visit a place that makes you smile. Play games, watch comedy shows, or engage in playful activities that bring out your inner child.",
+      "category": "activities",
+      "keywords": ["activities", "joy", "dancing", "creative", "nature", "playful"]
+    },
+    {
+      "title": "Mood Lifting Strategies",
+      "content": "When you need a mood boost, try simple strategies that can quickly lift your spirits. Listen to your favorite upbeat songs, look at photos of happy memories, or engage in physical activity. Practice smiling, even if you don't feel like it - the physical act can trigger positive emotions. Surround yourself with bright colors, spend time with uplifting people, or do something kind for someone else.",
+      "category": "mood",
+      "keywords": ["mood", "lifting", "music", "memories", "smiling", "colors"]
+    },
+    {
+      "title": "Playful Communication Styles",
+      "content": "Bring playfulness into your interactions with others. Use light humor, share funny observations, or engage in playful banter. Ask fun questions like 'If you could have any superpower, what would it be?' or 'What's the most ridiculous thing that made you laugh today?' Use emojis, GIFs, or playful language in digital communications. Remember that playfulness can help build connections and reduce tension.",
+      "category": "communication",
+      "keywords": ["playful", "communication", "humor", "banter", "questions", "connections"]
+    },
+    {
+      "title": "Joy Cultivation Practices",
+      "content": "Cultivate joy by actively seeking and creating positive experiences. Practice savoring - fully experiencing and appreciating good moments. Create joy rituals like a weekly 'fun activity' or daily 'something that made me smile.' Practice gratitude for small pleasures. Engage in activities that bring you genuine happiness, not just temporary distractions. Share your joy with others - happiness is contagious.",
+      "category": "joy",
+      "keywords": ["joy", "cultivation", "savoring", "rituals", "gratitude", "happiness"]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "companion": "Echo",
+  "knowledgeEntries": [
+    {
+      "title": "Active Listening Techniques",
+      "content": "Active listening involves fully concentrating on what the other person is saying, understanding their message, and responding thoughtfully. Use techniques like paraphrasing ('It sounds like you're feeling...'), reflecting emotions ('I can hear the frustration in your voice'), and asking open-ended questions ('Can you tell me more about that?'). Avoid interrupting and give the speaker your full attention.",
+      "category": "listening",
+      "keywords": ["listening", "active", "paraphrasing", "reflecting", "attention", "communication"]
+    },
+    {
+      "title": "Emotional Validation Strategies",
+      "content": "Emotional validation means acknowledging and accepting someone's feelings without trying to change them. Use phrases like 'I can understand why you'd feel that way' or 'Your feelings are completely valid.' Avoid minimizing with statements like 'It's not that bad' or 'You shouldn't feel that way.' Sometimes people just need to be heard and understood.",
+      "category": "validation",
+      "keywords": ["validation", "emotions", "acknowledgment", "acceptance", "understanding", "feelings"]
+    },
+    {
+      "title": "Reflection and Processing Techniques",
+      "content": "Reflection helps people process their thoughts and feelings more deeply. Use techniques like 'What I'm hearing is...' or 'It seems like the main concern is...' Help them explore their feelings by asking 'What's underneath that feeling?' or 'What would it look like if this situation was resolved?' Guide them to their own insights rather than providing solutions.",
+      "category": "reflection",
+      "keywords": ["reflection", "processing", "exploration", "insights", "feelings", "thoughts"]
+    },
+    {
+      "title": "Journaling Prompts for Self-Discovery",
+      "content": "Journaling can be a powerful tool for self-reflection and emotional processing. Try prompts like 'What am I feeling right now and why?' 'What patterns do I notice in my thoughts today?' 'What would I tell a friend in my situation?' 'What am I grateful for, even in difficult times?' 'What do I need to let go of?' Regular journaling helps build emotional awareness.",
+      "category": "journaling",
+      "keywords": ["journaling", "prompts", "self-discovery", "reflection", "awareness", "processing"]
+    },
+    {
+      "title": "Empathetic Response Framework",
+      "content": "Empathetic responses show understanding and compassion. Start with acknowledgment ('I can see this is really difficult for you'), then validate their experience ('It makes complete sense that you'd feel this way'), and offer support ('I'm here with you through this'). Avoid giving advice unless asked, and focus on being present with their emotions rather than trying to fix them.",
+      "category": "empathy",
+      "keywords": ["empathy", "compassion", "acknowledgment", "validation", "support", "presence"]
+    }
+  ]
+}

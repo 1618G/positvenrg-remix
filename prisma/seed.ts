@@ -31,6 +31,32 @@ async function main() {
       isPremium: false,
       systemPrompt: "You are PositiveNRG, a bright and energetic AI companion. Your role is to lift spirits, find the positive in any situation, and bring light and energy to conversations. You're always optimistic, encouraging, and ready to help users see the bright side. Use warm, enthusiastic language and focus on solutions rather than problems. Always maintain a cheerful, supportive tone.",
       trainingData: {
+        therapeuticApproach: "Positive psychology with elements of cognitive-behavioral therapy",
+        conversationFlows: {
+          initial_contact: ["greeting", "mood_check", "positive_exploration"],
+          crisis_detected: ["validate", "assess", "resources", "follow_up"],
+          daily_support: ["gratitude_practice", "energy_boost", "motivation"]
+        },
+        emotionalIntelligence: {
+          triggers: ["sadness", "depression", "low_energy", "negativity"],
+          responses: {
+            sadness: "Acknowledge the feeling while gently guiding toward hope and light",
+            depression: "Validate the struggle while offering practical energy-boosting activities",
+            low_energy: "Suggest physical and mental energy restoration techniques"
+          }
+        },
+        specializedKnowledge: {
+          gratitude_practices: true,
+          energy_boosters: true,
+          affirmations: true,
+          goal_setting: false,
+          grief_support: false
+        },
+        crisisProtocols: {
+          suicide: "immediate_resources_and_validation",
+          self_harm: "gentle_intervention_with_hope",
+          depression: "energy_restoration_and_professional_referral"
+        },
         conversationStarters: [
           "What's bringing you joy today?",
           "Tell me about something positive that happened recently",
@@ -216,14 +242,58 @@ async function main() {
     });
   }
 
-  console.log("Database seeded successfully!");
-}
+      // Add crisis resources to knowledge base
+      const crisisResources = [
+        {
+          title: "Emergency Crisis Resources",
+          content: "If you're in immediate danger or having thoughts of suicide, please contact emergency services immediately. UK: 999, US: 911. For crisis support: Samaritans (UK) 116 123, Crisis Text Line (US) 741741.",
+          category: "crisis",
+          keywords: ["emergency", "suicide", "crisis", "immediate", "danger"],
+          companionId: null // Available to all companions
+        },
+        {
+          title: "Mental Health Support Services",
+          content: "Professional mental health support is available. In the UK: NHS 111, Mind.org.uk. In the US: National Suicide Prevention Lifeline 988, NAMI.org. These services provide confidential support and can connect you with local resources.",
+          category: "support",
+          keywords: ["mental", "health", "support", "professional", "therapy"],
+          companionId: null
+        },
+        {
+          title: "Grief and Bereavement Support",
+          content: "Specialized grief support is available through Cruse Bereavement Care (UK) 0808 808 1677, GriefShare.org, and local bereavement centers. These services understand the unique challenges of grief and provide compassionate support.",
+          category: "grief",
+          keywords: ["grief", "bereavement", "loss", "death", "mourning"],
+          companionId: null
+        }
+      ];
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+      // Add crisis resources to knowledge base
+      for (const resource of crisisResources) {
+        await prisma.companionKnowledge.upsert({
+          where: { 
+            id: `crisis-${resource.title.toLowerCase().replace(/\s+/g, '-')}`
+          },
+          update: resource,
+          create: {
+            id: `crisis-${resource.title.toLowerCase().replace(/\s+/g, '-')}`,
+            title: resource.title,
+            content: resource.content,
+            category: resource.category,
+            keywords: resource.keywords,
+            companionId: resource.companionId || admin.id, // Use admin as default
+            isActive: true
+          }
+        });
+      }
+
+      console.log("Database seeded successfully with enhanced training data and crisis resources!");
+    }
+
+    main()
+      .catch((e) => {
+        console.error(e);
+        process.exit(1);
+      })
+      .finally(async () => {
+        await prisma.$disconnect();
+      });
