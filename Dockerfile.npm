@@ -4,23 +4,20 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm@latest
-
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies (ignore lockfile compatibility)
-RUN pnpm install --no-frozen-lockfile
+# Install dependencies
+RUN npm ci --only=production
 
 # Copy source code
 COPY . .
 
 # Generate Prisma client
-RUN pnpm prisma generate
+RUN npx prisma generate
 
 # Build the application
-RUN pnpm build
+RUN npm run build
 
 # Expose port
 EXPOSE 10000
@@ -31,4 +28,4 @@ ENV PORT=10000
 ENV LOG_LEVEL=info
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
