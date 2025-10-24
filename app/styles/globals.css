@@ -11,7 +11,7 @@
   }
   
   body {
-    @apply bg-sunrise-50 text-charcoal-900;
+    @apply bg-cosmic-50 text-cosmic-900;
     font-feature-settings: 'kern' 1, 'liga' 1;
   }
 
@@ -23,94 +23,94 @@
 }
 
 @layer components {
-  /* Button Styles - Warm & Inviting */
+  /* Button Styles - Cosmic & Mystical */
   .btn-primary {
-    @apply bg-sunrise-gradient hover:shadow-warm text-charcoal-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply bg-cosmic-gradient hover:shadow-cosmic text-cosmic-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 600;
   }
   
   .btn-secondary {
-    @apply bg-pastel-200 hover:bg-pastel-300 text-charcoal-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply bg-electric-200 hover:bg-electric-300 text-cosmic-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 600;
   }
 
   .btn-ghost {
-    @apply bg-transparent hover:bg-sunrise-100 text-charcoal-700 font-medium py-3 px-6 rounded-2xl transition-all duration-300;
+    @apply bg-transparent hover:bg-electric-100 text-cosmic-700 font-medium py-3 px-6 rounded-2xl transition-all duration-300;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 500;
   }
   
-  /* Card Styles - Soft & Welcoming */
+  /* Card Styles - Cosmic & Mystical */
   .card {
-    @apply bg-white rounded-3xl shadow-soft border border-sunrise-100 p-8 transition-all duration-300 hover:shadow-warm;
+    @apply bg-white rounded-3xl shadow-cosmic border border-cosmic-200 p-8 transition-all duration-300 hover:shadow-electric;
   }
 
   .card-character {
-    @apply bg-white rounded-3xl shadow-soft border border-sunrise-100 p-6 transition-all duration-300 hover:shadow-sunrise hover:scale-105 cursor-pointer;
+    @apply bg-white rounded-3xl shadow-cosmic border border-cosmic-200 p-6 transition-all duration-300 hover:shadow-fire hover:scale-105 cursor-pointer;
   }
   
-  /* Input Styles - Gentle & Accessible */
+  /* Input Styles - Cosmic & Accessible */
   .input {
-    @apply w-full px-4 py-3 border border-mist-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sunrise-200 focus:border-sunrise-200 transition-all duration-300;
+    @apply w-full px-4 py-3 border border-cosmic-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-electric-500 focus:border-electric-500 transition-all duration-300;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .input:focus {
-    @apply shadow-soft;
+    @apply shadow-electric;
   }
   
   /* Typography Styles */
   .heading-xl {
-    @apply text-4xl md:text-6xl font-bold text-charcoal-900;
+    @apply text-4xl md:text-6xl font-bold text-cosmic-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.1;
   }
 
   .heading-lg {
-    @apply text-3xl md:text-4xl font-semibold text-charcoal-900;
+    @apply text-3xl md:text-4xl font-semibold text-cosmic-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.2;
   }
 
   .heading-md {
-    @apply text-2xl md:text-3xl font-semibold text-charcoal-900;
+    @apply text-2xl md:text-3xl font-semibold text-cosmic-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.3;
   }
 
   .text-body {
-    @apply text-lg text-charcoal-700 leading-relaxed;
+    @apply text-lg text-cosmic-700 leading-relaxed;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .text-accent {
-    @apply text-charcoal-600;
+    @apply text-cosmic-600;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 500;
   }
 
   /* Special Components */
   .gradient-text {
-    @apply bg-sunrise-gradient bg-clip-text text-transparent;
+    @apply bg-cosmic-gradient bg-clip-text text-transparent;
   }
 
   .safe-space-banner {
-    @apply bg-pastel-50 border-l-4 border-pastel-200 p-6 rounded-2xl;
+    @apply bg-electric-50 border-l-4 border-electric-200 p-6 rounded-2xl;
   }
 
   .crisis-resources {
-    @apply bg-peach-50 border border-peach-200 p-4 rounded-xl;
+    @apply bg-passion-50 border border-passion-200 p-4 rounded-xl;
   }
 
   /* Avatar/Character Styles */
   .avatar-frame {
-    @apply w-20 h-20 rounded-full overflow-hidden border-4 border-sunrise-200;
+    @apply w-20 h-20 rounded-full overflow-hidden border-4 border-electric-200;
   }
 
   .character-portrait {
-    @apply w-full h-48 rounded-2xl object-cover shadow-lg;
+    @apply w-full h-48 rounded-2xl object-cover shadow-cosmic;
   }
 
   /* Icon sizing fixes */
@@ -128,13 +128,13 @@
 
   /* Navigation */
   .nav-link {
-    @apply text-charcoal-700 hover:text-sunrise-600 font-medium transition-colors duration-300;
+    @apply text-cosmic-700 hover:text-electric-600 font-medium transition-colors duration-300;
     font-family: 'Nunito', system-ui, sans-serif;
   }
 
   /* Hero Section */
   .hero-gradient {
-    background: linear-gradient(135deg, #FFE87C 0%, #FFB88C 50%, #A8E6A1 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 50%, #f97316 100%);
   }
 
   /* Animations */
@@ -160,5 +160,58 @@
       opacity: 1; 
       transform: translateY(0); 
     }
+  }
+
+  /* Enhanced Chat Styles */
+  .chat-message-user {
+    @apply bg-cosmic-gradient text-white rounded-3xl rounded-br-lg p-6 shadow-cosmic;
+  }
+
+  .chat-message-ai {
+    @apply bg-gradient-to-br from-electric-50 to-teal-50 border border-electric-200 rounded-3xl rounded-tl-lg p-6 shadow-ethereal;
+  }
+
+  .chat-typing-indicator {
+    @apply flex items-center space-x-2;
+  }
+
+  .chat-typing-dot {
+    @apply w-2 h-2 bg-electric-400 rounded-full animate-bounce;
+  }
+
+  .chat-input-container {
+    @apply relative flex-1;
+  }
+
+  .chat-send-button {
+    @apply w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 bg-cosmic-gradient hover:shadow-cosmic hover:scale-110;
+  }
+
+  .chat-quick-action {
+    @apply card text-left hover:shadow-electric transition-all duration-300 p-6 group hover:scale-105 cursor-pointer;
+  }
+
+  /* Scrollbar Styling for Chat */
+  .chat-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #0ea5e9 #f1f5f9;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    background: #0ea5e9;
+    border-radius: 3px;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #0284c7;
   }
 }

@@ -1,0 +1,8 @@
+HTTP/1.1 302 Found
+location: /dashboard
+set-cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWg0N2FtYjkwMDAwdGE3c3B4M2QwajVwIiwiaWF0IjoxNzYxMjg3Mzc0LCJleHAiOjE3NjE4OTIxNzR9.-ObwnGwbwiSWxsYW_IZz1caq6-ItruZ5--lce0_bpvQ; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800
+Date: Fri, 24 Oct 2025 06:29:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
