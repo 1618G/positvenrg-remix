@@ -17,7 +17,7 @@ export default function Index() {
   const { companions } = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-sunrise-50">
+    <div className="min-h-screen bg-cosmic-50">
       {/* Navigation */}
       <Navigation />
 
@@ -25,8 +25,8 @@ export default function Index() {
       <main className="relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 hero-gradient opacity-10"></div>
-        <div className="absolute top-20 right-10 w-32 h-32 bg-sunrise-200 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-10 w-24 h-24 bg-pastel-200 rounded-full blur-2xl"></div>
+        <div className="absolute top-20 right-10 w-32 h-32 bg-electric-200 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 bg-teal-200 rounded-full blur-2xl"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center fade-in">
