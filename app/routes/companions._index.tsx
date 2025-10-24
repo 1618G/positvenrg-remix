@@ -1,5 +1,6 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
 import { db } from "~/lib/db.server";
 import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
@@ -17,6 +18,27 @@ const moods = ['All', 'Cheerful', 'Calm', 'Motivational', 'Night Owl', 'Empathet
 
 export default function CompanionsPage() {
   const { companions } = useLoaderData<typeof loader>();
+  const [selectedMood, setSelectedMood] = useState('All');
+
+  // Filter companions based on selected mood
+  const filteredCompanions = companions.filter(companion => {
+    if (selectedMood === 'All') return true;
+    
+    const personality = companion.personality?.toLowerCase() || '';
+    const mood = selectedMood.toLowerCase();
+    
+    // Map moods to personality traits
+    const moodMappings = {
+      'cheerful': ['cheerful', 'positive', 'sunny', 'bright', 'energetic'],
+      'calm': ['calm', 'peaceful', 'mindful', 'gentle', 'serene'],
+      'motivational': ['motivated', 'goal-oriented', 'action-focused', 'productive', 'driven'],
+      'night owl': ['night', 'evening', 'late', 'insomnia', 'sleep'],
+      'empathetic': ['empathetic', 'listening', 'understanding', 'supportive', 'caring']
+    };
+    
+    const traits = moodMappings[mood as keyof typeof moodMappings] || [];
+    return traits.some(trait => personality.includes(trait));
+  });
 
   return (
     <div className="min-h-screen bg-sunrise-50">
@@ -39,8 +61,9 @@ export default function CompanionsPage() {
               {moods.map((mood) => (
                 <button
                   key={mood}
+                  onClick={() => setSelectedMood(mood)}
                   className={`px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
-                    mood === 'All' 
+                    selectedMood === mood
                       ? 'bg-sunrise-gradient text-charcoal-900 shadow-warm' 
                       : 'bg-white text-charcoal-700 hover:bg-sunrise-100 border border-sunrise-200'
                   }`}
@@ -57,7 +80,7 @@ export default function CompanionsPage() {
       <section className="py-16 bg-sunrise-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {companions.map((companion) => (
+            {filteredCompanions.map((companion) => (
               <div key={companion.id} className="card-character group">
                 <div className="text-center">
                   {/* Avatar */}

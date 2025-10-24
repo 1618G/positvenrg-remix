@@ -70,6 +70,7 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [messageInput, setMessageInput] = useState("");
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -80,6 +81,13 @@ export default function Chat() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Clear input after successful submission
+  useEffect(() => {
+    if (actionData?.success) {
+      setMessageInput("");
+    }
+  }, [actionData]);
 
   // Simulate typing indicator
   useEffect(() => {
@@ -92,22 +100,21 @@ export default function Chat() {
 
   // Quick action handlers
   const handleQuickAction = (message: string) => {
+    setMessageInput(message);
     if (inputRef.current) {
-      inputRef.current.value = message;
       inputRef.current.focus();
     }
   };
 
   return (
-    <div className="h-screen flex flex-col bg-cosmic-50">
+    <div className="h-screen flex flex-col bg-gray-50">
       {/* Fixed Header */}
-      <div className="flex-shrink-0 bg-cosmic-duality relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-electric-500/20 via-teal-500/20 to-fire-500/20"></div>
-        <div className="relative px-6 py-4 flex items-center justify-between">
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link 
               to="/companions" 
-              className="flex items-center space-x-2 text-white/90 hover:text-white transition-colors"
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -115,23 +122,18 @@ export default function Chat() {
               <span className="text-sm font-medium">Back</span>
             </Link>
             <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-cosmic border-2 border-white/50">
-                  <span className="text-2xl">{companion.avatar}</span>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-fire-500 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-2xl">{companion.avatar}</span>
               </div>
               <div>
-                <h1 className="text-white font-semibold text-lg">{companion.name}</h1>
-                <p className="text-white/80 text-sm">{companion.description}</p>
+                <h1 className="text-lg font-semibold text-gray-900">{companion.name}</h1>
+                <p className="text-sm text-gray-600">{companion.description}</p>
               </div>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             {companion.personality?.split(',').slice(0, 2).map((trait, index) => (
-              <span key={index} className="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full border border-white/30">
+              <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
                 {trait.trim()}
               </span>
             ))}
@@ -142,30 +144,28 @@ export default function Chat() {
       {/* Full Height Chat Area */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-cosmic-50 to-white chat-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
           {/* Welcome Message */}
           {chat.messages.length === 0 && !actionData && (
             <div className="flex justify-start">
-              <div className="max-w-2xl">
-                <div className="bg-gradient-to-br from-electric-50 to-teal-50 border border-electric-200 rounded-3xl rounded-tl-lg p-6 shadow-ethereal">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-electric-gradient rounded-full flex items-center justify-center mr-4 shadow-electric">
-                      <span className="text-xl">{companion.avatar}</span>
+              <div className="max-w-3xl">
+                <div className="bg-white rounded-2xl rounded-tl-lg p-6 shadow-sm border border-gray-200">
+                  <div className="flex items-center mb-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-lg">{companion.avatar}</span>
                     </div>
                     <div>
-                      <span className="font-semibold text-cosmic-900 text-lg">{companion.name}</span>
-                      <p className="text-cosmic-600 text-sm">Online now</p>
+                      <span className="font-semibold text-gray-900">{companion.name}</span>
+                      <p className="text-gray-500 text-sm">AI Companion</p>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <p className="text-cosmic-800 text-lg leading-relaxed">
-                      Hello! I'm {companion.name}, {companion.description?.toLowerCase() || "your AI companion"}. 
-                      How are you feeling today?
-                    </p>
-                    <div className="flex items-center space-x-2 text-cosmic-500 text-sm">
-                      <div className="w-2 h-2 bg-fire-500 rounded-full animate-pulse"></div>
-                      <span>Just now</span>
-                    </div>
+                  <p className="text-gray-800 text-lg leading-relaxed">
+                    Hello! I'm {companion.name}, {companion.description?.toLowerCase() || "your AI companion"}. 
+                    How are you feeling today?
+                  </p>
+                  <div className="flex items-center space-x-2 text-gray-500 text-sm mt-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>Just now</span>
                   </div>
                 </div>
               </div>
@@ -177,10 +177,10 @@ export default function Chat() {
             <>
               {/* User Message */}
               <div className="flex justify-end">
-                <div className="max-w-2xl order-2">
-                  <div className="bg-cosmic-gradient text-white rounded-3xl rounded-br-lg p-6 shadow-cosmic">
+                <div className="max-w-3xl">
+                  <div className="bg-blue-500 text-white rounded-2xl rounded-br-lg p-6 shadow-sm">
                     <p className="text-lg leading-relaxed mb-2">{actionData.userMessage}</p>
-                    <div className="flex items-center justify-end space-x-2 text-white/70 text-sm">
+                    <div className="flex items-center justify-end space-x-2 text-blue-100 text-sm">
                       <span>You</span>
                       <span>•</span>
                       <span>{new Date().toLocaleTimeString()}</span>
@@ -191,20 +191,20 @@ export default function Chat() {
               
               {/* AI Response */}
               <div className="flex justify-start">
-                <div className="max-w-2xl order-1">
-                  <div className="bg-gradient-to-br from-electric-50 to-teal-50 border border-electric-200 rounded-3xl rounded-tl-lg p-6 shadow-ethereal">
-                    <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-electric-gradient rounded-full flex items-center justify-center mr-3 shadow-electric">
-                        <span className="text-sm">{companion.avatar}</span>
+                <div className="max-w-3xl">
+                  <div className="bg-white rounded-2xl rounded-tl-lg p-6 shadow-sm border border-gray-200">
+                    <div className="flex items-center mb-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <span className="text-lg">{companion.avatar}</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-cosmic-900">{companion.name}</span>
-                        <p className="text-cosmic-600 text-sm">AI Companion</p>
+                        <span className="font-semibold text-gray-900">{companion.name}</span>
+                        <p className="text-gray-500 text-sm">AI Companion</p>
                       </div>
                     </div>
-                    <p className="text-cosmic-800 text-lg leading-relaxed mb-3">{actionData.aiResponse}</p>
-                    <div className="flex items-center space-x-2 text-cosmic-500 text-sm">
-                      <div className="w-2 h-2 bg-fire-500 rounded-full animate-pulse"></div>
+                    <p className="text-gray-800 text-lg leading-relaxed mb-3">{actionData.aiResponse}</p>
+                    <div className="flex items-center space-x-2 text-gray-500 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                       <span>{new Date().toLocaleTimeString()}</span>
                     </div>
                   </div>
@@ -216,24 +216,24 @@ export default function Chat() {
           {/* Typing Indicator */}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="max-w-2xl">
-                <div className="bg-gradient-to-br from-electric-50 to-teal-50 border border-electric-200 rounded-3xl rounded-tl-lg p-6 shadow-ethereal">
+              <div className="max-w-3xl">
+                <div className="bg-white rounded-2xl rounded-tl-lg p-6 shadow-sm border border-gray-200">
                   <div className="flex items-center mb-3">
-                    <div className="w-10 h-10 bg-electric-gradient rounded-full flex items-center justify-center mr-3 shadow-electric">
-                      <span className="text-sm">{companion.avatar}</span>
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-lg">{companion.avatar}</span>
                     </div>
                     <div>
-                      <span className="font-semibold text-cosmic-900">{companion.name}</span>
-                      <p className="text-cosmic-600 text-sm">Typing...</p>
+                      <span className="font-semibold text-gray-900">{companion.name}</span>
+                      <p className="text-gray-500 text-sm">Typing...</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-electric-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-electric-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-electric-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    <span className="text-cosmic-600 text-sm ml-2">Thinking...</span>
+                    <span className="text-gray-600 text-sm ml-2">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -245,26 +245,28 @@ export default function Chat() {
         </div>
 
         {/* Fixed Input Area */}
-        <div className="flex-shrink-0 border-t border-cosmic-200 p-6 bg-white">
-          <Form method="post" className="flex gap-4 items-end">
-            <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                type="text"
-                name="message"
-                placeholder="Type your message..."
-                required
-                className="w-full px-6 py-4 border border-cosmic-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-electric-500 focus:border-electric-500 transition-all duration-300 text-lg"
-                disabled={isSubmitting}
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-6">
+          <Form method="post" className="space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  name="message"
+                  placeholder="Type your message..."
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
+                  disabled={isSubmitting}
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                />
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                     isSubmitting 
-                      ? 'bg-cosmic-300 cursor-not-allowed' 
-                      : 'bg-cosmic-gradient hover:shadow-cosmic hover:scale-110'
+                      ? 'bg-gray-300 cursor-not-allowed' 
+                      : 'bg-blue-500 hover:bg-blue-600 hover:scale-110'
                   }`}
                 >
                   {isSubmitting ? (
@@ -277,16 +279,14 @@ export default function Chat() {
                 </button>
               </div>
             </div>
-          </Form>
-          
-          {actionData?.error && (
-            <div className="mt-4 p-4 bg-passion-50 border border-passion-200 rounded-xl">
-              <p className="text-sm text-passion-800">{actionData.error}</p>
-            </div>
-          )}
+            
+            {actionData?.error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-sm text-red-800">{actionData.error}</p>
+              </div>
+            )}
 
-          {/* Quick Actions */}
-          <div className="mt-4">
+            {/* Quick Actions */}
             <div className="flex flex-wrap gap-2">
               {[
                 "How are you feeling?",
@@ -296,14 +296,15 @@ export default function Chat() {
               ].map((starter, index) => (
                 <button
                   key={index}
-                  className="px-3 py-1 bg-cosmic-100 hover:bg-cosmic-200 text-cosmic-700 text-sm rounded-full transition-colors duration-200"
+                  type="button"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors duration-200"
                   onClick={() => handleQuickAction(starter)}
                 >
                   {starter}
                 </button>
               ))}
             </div>
-          </div>
+          </Form>
         </div>
       </div>
     </div>
