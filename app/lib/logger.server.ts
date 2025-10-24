@@ -159,6 +159,45 @@ export const securityLogger = {
   },
 };
 
+// Crisis detection logging
+export const crisisLogger = {
+  crisisDetected: (userId: string, riskLevel: string, keywords: string[], ip?: string) => {
+    logger.warn({
+      event: 'crisis_detected',
+      userId,
+      riskLevel,
+      keywords,
+      ip,
+    }, `Crisis detected for user ${userId}: ${riskLevel} risk with keywords: ${keywords.join(', ')}`);
+  },
+
+  crisisResolved: (userId: string, crisisId: string, resolution: string) => {
+    logger.info({
+      event: 'crisis_resolved',
+      userId,
+      crisisId,
+      resolution,
+    }, `Crisis resolved for user ${userId}: ${resolution}`);
+  },
+
+  crisisEscalated: (userId: string, riskLevel: string, resources: string[]) => {
+    logger.error({
+      event: 'crisis_escalated',
+      userId,
+      riskLevel,
+      resources,
+    }, `Crisis escalated for user ${userId}: ${riskLevel} risk - resources provided: ${resources.join(', ')}`);
+  },
+
+  crisisResourcesProvided: (userId: string, resources: string[]) => {
+    logger.info({
+      event: 'crisis_resources_provided',
+      userId,
+      resources,
+    }, `Crisis resources provided to user ${userId}: ${resources.join(', ')}`);
+  },
+};
+
 // Performance logging
 export const performanceLogger = {
   slowQuery: (operation: string, duration: number, threshold: number = 1000) => {
