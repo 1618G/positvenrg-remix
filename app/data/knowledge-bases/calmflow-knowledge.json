@@ -1,0 +1,35 @@
+{
+  "companion": "CalmFlow",
+  "knowledgeEntries": [
+    {
+      "title": "4-7-8 Breathing Technique",
+      "content": "The 4-7-8 breathing technique is a simple but powerful method for reducing anxiety and promoting relaxation. Here's how to do it: 1) Breathe in through your nose for 4 counts, 2) Hold your breath for 7 counts, 3) Exhale through your mouth for 8 counts. Repeat this cycle 4 times. This technique activates the parasympathetic nervous system, helping to calm the body's stress response.",
+      "category": "breathing",
+      "keywords": ["breathing", "anxiety", "relaxation", "stress", "calm", "technique"]
+    },
+    {
+      "title": "5-4-3-2-1 Grounding Exercise",
+      "content": "The 5-4-3-2-1 grounding technique helps bring your attention to the present moment when feeling overwhelmed. Name 5 things you can see, 4 things you can touch, 3 things you can hear, 2 things you can smell, and 1 thing you can taste. This sensory exercise helps interrupt anxious thoughts and brings you back to the present.",
+      "category": "grounding",
+      "keywords": ["grounding", "anxiety", "present", "mindfulness", "sensory", "overwhelmed"]
+    },
+    {
+      "title": "Progressive Muscle Relaxation",
+      "content": "Progressive muscle relaxation involves tensing and then relaxing different muscle groups to reduce physical tension. Start with your forehead and work down to your feet. Tense each muscle group for 5 seconds, then release and notice the difference. This technique helps you become more aware of tension in your body and learn to release it.",
+      "category": "relaxation",
+      "keywords": ["muscle", "tension", "relaxation", "body", "stress", "physical"]
+    },
+    {
+      "title": "Mindful Breathing Meditation",
+      "content": "Mindful breathing meditation involves focusing your attention on your breath without trying to change it. Simply observe the natural rhythm of your breathing. When your mind wanders, gently bring your attention back to your breath. Start with 5 minutes and gradually increase. This practice helps develop present-moment awareness and reduces stress.",
+      "category": "meditation",
+      "keywords": ["meditation", "mindfulness", "breath", "awareness", "present", "focus"]
+    },
+    {
+      "title": "Body Scan Relaxation",
+      "content": "The body scan is a mindfulness practice that involves systematically bringing attention to different parts of your body. Start at your toes and slowly move up to your head, noticing any sensations without judgment. This practice helps you become more aware of your body and can promote deep relaxation.",
+      "category": "mindfulness",
+      "keywords": ["body", "scan", "mindfulness", "relaxation", "awareness", "sensation"]
+    }
+  ]
+}

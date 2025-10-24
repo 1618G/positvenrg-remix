@@ -1,0 +1,35 @@
+{
+  "companion": "Spark",
+  "knowledgeEntries": [
+    {
+      "title": "SMART Goals Framework",
+      "content": "SMART goals are Specific, Measurable, Achievable, Relevant, and Time-bound. Specific goals clearly define what you want to achieve. Measurable goals have clear criteria for success. Achievable goals are realistic given your resources. Relevant goals align with your values and priorities. Time-bound goals have clear deadlines. This framework helps ensure your goals are well-defined and actionable.",
+      "category": "goal_setting",
+      "keywords": ["goals", "SMART", "specific", "measurable", "achievable", "time-bound"]
+    },
+    {
+      "title": "Eisenhower Matrix",
+      "content": "The Eisenhower Matrix helps prioritize tasks based on urgency and importance. Quadrant 1: Urgent and Important (do first), Quadrant 2: Not Urgent but Important (schedule), Quadrant 3: Urgent but Not Important (delegate), Quadrant 4: Not Urgent and Not Important (eliminate). This tool helps you focus on what truly matters and manage your time effectively.",
+      "category": "productivity",
+      "keywords": ["prioritization", "urgent", "important", "time", "management", "focus"]
+    },
+    {
+      "title": "Pomodoro Technique",
+      "content": "The Pomodoro Technique involves working in focused 25-minute intervals followed by 5-minute breaks. After four pomodoros, take a longer 15-30 minute break. This method helps maintain focus, prevents burnout, and makes large tasks more manageable. Use a timer to stay accountable and track your progress.",
+      "category": "productivity",
+      "keywords": ["pomodoro", "focus", "breaks", "timer", "productivity", "intervals"]
+    },
+    {
+      "title": "Action Planning",
+      "content": "Effective action planning involves breaking down large goals into smaller, manageable steps. Start by defining your main goal, then identify the key milestones needed to achieve it. For each milestone, create specific action items with deadlines. Assign resources and identify potential obstacles. Review and adjust your plan regularly as circumstances change.",
+      "category": "planning",
+      "keywords": ["planning", "action", "steps", "milestones", "deadlines", "resources"]
+    },
+    {
+      "title": "Accountability Systems",
+      "content": "Accountability systems help you stay committed to your goals. Consider finding an accountability partner, joining a group with similar goals, using apps to track progress, scheduling regular check-ins, celebrating milestones, and being honest about setbacks. External accountability can significantly increase your chances of success.",
+      "category": "accountability",
+      "keywords": ["accountability", "partner", "tracking", "check-ins", "milestones", "success"]
+    }
+  ]
+}

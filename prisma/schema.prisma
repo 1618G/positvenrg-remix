@@ -24,6 +24,8 @@ model User {
   chats     Chat[]
   messages  Message[]
   companions Companion[]
+  preferences UserPreference[]
+  crisisLogs CrisisLog[]
 
   @@map("users")
 }
@@ -41,6 +43,7 @@ model Companion {
   isActive    Boolean  @default(true)
   systemPrompt String? // System prompt for AI training
   trainingData Json?   // Additional training data and context
+  knowledgeBaseUrl String? // URL to companion's knowledge base
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -48,6 +51,7 @@ model Companion {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   chats       Chat[]
+  knowledge   CompanionKnowledge[]
 
   @@map("companions")
 }
@@ -56,6 +60,7 @@ model Chat {
   id          String   @id @default(cuid())
   title       String?
   isActive    Boolean  @default(true)
+  conversationContext Json? // Store conversation context and summary
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -65,6 +70,8 @@ model Chat {
   companionId String
   companion   Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
   messages    Message[]
+  summaries   ConversationSummary[]
+  crisisLogs  CrisisLog[]
 
   @@map("chats")
 }
@@ -73,6 +80,7 @@ model Message {
   id        String      @id @default(cuid())
   content   String
   role      MessageRole
+  metadata  Json?       // Store sentiment, keywords, crisis flags
   createdAt DateTime    @default(now())
 
   // Relations
@@ -80,6 +88,7 @@ model Message {
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   chatId    String
   chat      Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  crisisLogs CrisisLog[]
 
   @@map("messages")
 }
@@ -93,4 +102,74 @@ enum MessageRole {
   USER
   ASSISTANT
   SYSTEM
+}
+
+model UserPreference {
+  id          String   @id @default(cuid())
+  preferences Json?    // User preferences, triggers, companion-specific notes
+  triggers    Json?    // Known triggers and sensitivities
+  goals       Json?    // User goals and objectives
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model ConversationSummary {
+  id          String   @id @default(cuid())
+  summary     String   // AI-generated conversation summary
+  keyPoints   Json?    // Extracted key points, preferences, triggers
+  sentiment   String?  // Overall conversation sentiment
+  topics      Json?    // Main topics discussed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  chatId      String
+  chat        Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("conversation_summaries")
+}
+
+model CompanionKnowledge {
+  id          String   @id @default(cuid())
+  title       String   // Knowledge entry title
+  content     String   // Knowledge content
+  category    String   // Category (breathing, grief, productivity, etc.)
+  keywords    Json?    // Search keywords
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companionId String
+  companion   Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+
+  @@map("companion_knowledge")
+}
+
+model CrisisLog {
+  id          String   @id @default(cuid())
+  riskLevel   String   // low, medium, high, critical
+  keywords    Json?    // Detected crisis keywords
+  sentiment   String?  // Sentiment analysis result
+  resources   Json?    // Crisis resources provided
+  resolved    Boolean  @default(false)
+  notes       String?  // Admin notes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId      String?
+  chat        Chat?    @relation(fields: [chatId], references: [id], onDelete: SetNull)
+  messageId   String?
+  message     Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@map("crisis_logs")
 }

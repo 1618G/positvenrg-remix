@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { db } from "~/lib/db.server";
 import { verifyUserSession, getUserById } from "~/lib/auth.server";
 import { generateCompanionResponse } from "~/lib/gemini.server";
+import { generateEnhancedCompanionResponse } from "~/lib/conversation-handler.server";
+import { getConversationContext, saveMessage, shouldGenerateSummary, generateConversationSummary } from "~/lib/memory.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   // For now, allow access without authentication
@@ -32,6 +34,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   // For now, allow actions without authentication
   // TODO: Re-enable authentication later
   const user = null; // No user required for now
+  const userId = "demo-user"; // Demo user ID for now
 
   const formData = await request.formData();
   const message = formData.get("message") as string;
@@ -48,18 +51,60 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return json({ error: "Companion not found" }, { status: 404 });
   }
 
-  // For demo purposes, generate a simple response without saving to database
-  const aiResponse = await generateCompanionResponse(
-    message,
-    companion.id,
-    []
-  );
-
-  return json({ 
-    success: true, 
-    userMessage: message,
-    aiResponse: aiResponse 
+  // Create or get chat session
+  let chat = await db.chat.findFirst({
+    where: {
+      userId: userId,
+      companionId: companion.id,
+      isActive: true
+    }
   });
+
+  if (!chat) {
+    chat = await db.chat.create({
+      data: {
+        userId: userId,
+        companionId: companion.id,
+        title: `Chat with ${companion.name}`,
+        isActive: true
+      }
+    });
+  }
+
+  try {
+    // Generate enhanced response with full context
+    const enhancedResponse = await generateEnhancedCompanionResponse(
+      message,
+      companion.id,
+      userId,
+      chat.id
+    );
+
+    return json({ 
+      success: true, 
+      userMessage: message,
+      aiResponse: enhancedResponse.response,
+      crisisDetected: enhancedResponse.crisisDetected,
+      crisisResources: enhancedResponse.crisisResources,
+      knowledgeUsed: enhancedResponse.knowledgeUsed,
+      featuresSuggested: enhancedResponse.featuresSuggested
+    });
+  } catch (error) {
+    console.error("Error generating enhanced response:", error);
+    
+    // Fallback to basic response
+    const aiResponse = await generateCompanionResponse(
+      message,
+      companion.id,
+      []
+    );
+
+    return json({ 
+      success: true, 
+      userMessage: message,
+      aiResponse: aiResponse 
+    });
+  }
 }
 
 export default function Chat() {

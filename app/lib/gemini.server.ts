@@ -58,7 +58,9 @@ export async function generateResponse(
 export async function generateCompanionResponse(
   message: string,
   companionId: string,
-  chatHistory: Array<{ role: "user" | "assistant"; content: string }> = []
+  chatHistory: Array<{ role: "user" | "assistant"; content: string }> = [],
+  conversationSummary?: string,
+  userPreferences?: object
 ) {
   // Get companion details from database
   const { db } = require("./db.server");
@@ -71,8 +73,27 @@ export async function generateCompanionResponse(
   }
 
   try {
-    // Use system prompt if available, otherwise fall back to personality
-    const systemPrompt = companion.systemPrompt || companion.personality || "A helpful and positive AI companion";
+    // Build enhanced system prompt with context
+    let systemPrompt = companion.systemPrompt || companion.personality || "A helpful and positive AI companion";
+    
+    // Add conversation summary if available
+    if (conversationSummary) {
+      systemPrompt += `\n\nConversation context: ${conversationSummary}`;
+    }
+    
+    // Add user preferences if available
+    if (userPreferences) {
+      systemPrompt += `\n\nUser preferences: ${JSON.stringify(userPreferences)}`;
+    }
+    
+    // Add specialized knowledge if available
+    if (companion.trainingData) {
+      const trainingData = companion.trainingData as any;
+      if (trainingData.specializedKnowledge) {
+        systemPrompt += `\n\nSpecialized knowledge available: ${JSON.stringify(trainingData.specializedKnowledge)}`;
+      }
+    }
+    
     return await generateResponse(message, systemPrompt, chatHistory);
   } catch (error) {
     console.log("API failed, using demo response for", companion.name);

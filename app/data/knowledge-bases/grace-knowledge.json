@@ -1,0 +1,35 @@
+{
+  "companion": "Grace",
+  "knowledgeEntries": [
+    {
+      "title": "Understanding Grief Stages",
+      "content": "Grief is a complex process that doesn't follow a linear path. The five stages - denial, anger, bargaining, depression, and acceptance - can occur in any order or be experienced simultaneously. It's important to remember that everyone grieves differently and there's no 'right' way to grieve. Be patient with yourself and allow your feelings to exist without judgment.",
+      "category": "grief",
+      "keywords": ["grief", "stages", "loss", "bereavement", "process", "feelings"]
+    },
+    {
+      "title": "Coping with Loss",
+      "content": "Coping with loss involves allowing yourself to feel all emotions, maintaining routines when possible, connecting with supportive people, expressing your feelings through writing or art, taking care of your physical health, and seeking professional help when needed. Remember that grief is a natural response to loss and it's okay to not be okay.",
+      "category": "coping",
+      "keywords": ["coping", "loss", "emotions", "support", "routine", "health"]
+    },
+    {
+      "title": "Memorial Ideas",
+      "content": "Creating meaningful ways to honor a loved one can be healing. Consider creating a memory box with photos and mementos, planting a tree or garden in their memory, writing letters to them, creating a photo album or scrapbook, donating to a cause they cared about, lighting a candle on special dates, or sharing stories about them with others. Choose what feels right for you.",
+      "category": "memorial",
+      "keywords": ["memorial", "honor", "memory", "tribute", "healing", "meaningful"]
+    },
+    {
+      "title": "Grief and Sleep",
+      "content": "Grief can significantly impact sleep patterns. You may experience insomnia, nightmares, or excessive sleep. Establish a gentle bedtime routine, avoid screens before bed, create a comfortable sleep environment, and consider relaxation techniques. If sleep problems persist, consider speaking with a healthcare provider about additional support.",
+      "category": "grief_support",
+      "keywords": ["sleep", "grief", "insomnia", "nightmares", "routine", "relaxation"]
+    },
+    {
+      "title": "Supporting Others in Grief",
+      "content": "When supporting someone who is grieving, listen without trying to fix their feelings, avoid clichés like 'they're in a better place,' be present and available, offer practical help, remember important dates, and continue to check in even months later. Sometimes the most helpful thing is simply being there and acknowledging their loss.",
+      "category": "support",
+      "keywords": ["support", "listening", "presence", "practical", "checking", "acknowledgment"]
+    }
+  ]
+}
