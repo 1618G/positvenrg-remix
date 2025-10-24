@@ -6,7 +6,7 @@ Your Render service is configured with the following environment variables:
 
 ### 🔑 **API Keys & Secrets**
 ```env
-GEMINI_API_KEY=AIzaSyA1883Y6gFZrwLPpfAQdeHFtWvIo6y2svw
+GEMINI_API_KEY=YOUR_NEW_API_KEY_HERE
 GEMINI_MODEL=gemini-2.5-flash
 JWT_SECRET=super-secret-jwt-key-change-this-in-production
 ```

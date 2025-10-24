@@ -71,7 +71,9 @@ export async function generateCompanionResponse(
   }
 
   try {
-    return await generateResponse(message, companion.personality || "A helpful and positive AI companion", chatHistory);
+    // Use system prompt if available, otherwise fall back to personality
+    const systemPrompt = companion.systemPrompt || companion.personality || "A helpful and positive AI companion";
+    return await generateResponse(message, systemPrompt, chatHistory);
   } catch (error) {
     console.log("API failed, using demo response for", companion.name);
     // Fallback to demo responses when API fails
@@ -186,6 +188,23 @@ function getDemoResponse(companionName: string, userMessage: string): string {
         "Your cheerful energy is wonderful! What's one thing that's making you feel happy today?",
         "I believe in the power of a sunny disposition. What's something that brings you joy?"
       ]
+    },
+    "Grace": {
+      greeting: [
+        "Hello, I'm Grace. I'm here to support you through difficult times with gentle understanding. How are you feeling today?",
+        "Hi there, I'm Grace, your compassionate companion for grief and loss. I'm here to walk with you through this journey. What's on your heart?",
+        "Hello, I'm Grace. I specialize in providing gentle support during times of grief and loss. You're not alone in this. How can I help you today?"
+      ],
+      grief: [
+        "I can feel the weight of your loss, and I want you to know that your grief is completely valid. There's no right or wrong way to grieve. What would help you feel supported right now?",
+        "Grief is a journey that looks different for everyone. It's okay to feel whatever you're feeling - sadness, anger, confusion, or even moments of peace. What's one thing that's been on your heart lately?",
+        "Loss changes us, and that's okay. You don't have to 'get over it' or 'move on' in any particular way. What's something you'd like to share about your loved one or your experience?"
+      ],
+      general: [
+        "I'm here to provide gentle support and understanding. What's something that's been weighing on your heart?",
+        "Grief is a complex journey, and I'm here to walk with you. What would help you feel more supported today?",
+        "I believe in the power of gentle compassion. What's something you'd like to talk about in this safe space?"
+      ]
     }
   };
 
@@ -208,6 +227,8 @@ function getDemoResponse(companionName: string, userMessage: string): string {
     responseCategory = "positive";
   } else if (message.includes("cheerful") || message.includes("bright") || message.includes("sunny")) {
     responseCategory = "cheerful";
+  } else if (message.includes("grief") || message.includes("loss") || message.includes("death") || message.includes("died") || message.includes("mourning") || message.includes("bereavement")) {
+    responseCategory = "grief";
   }
 
   const categoryResponses = companionResponses[responseCategory as keyof typeof companionResponses] || companionResponses.general;

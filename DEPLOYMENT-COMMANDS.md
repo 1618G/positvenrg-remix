@@ -46,7 +46,7 @@ git push origin main
 ### **Environment Variables:**
 ```env
 DATABASE_URL=postgresql://positive_nrg_user:McXmTUP4JfY8E42NHPcq1DofimcxYQVA@dpg-d3od0gripnbc73ft5cgg-a.frankfurt-postgres.render.com/positive_nrg
-GEMINI_API_KEY=AIzaSyA1883Y6gFZrwLPpfAQdeHFtWvIo6y2svw
+GEMINI_API_KEY=YOUR_NEW_API_KEY_HERE
 GEMINI_MODEL=gemini-2.5-flash
 JWT_SECRET=super-secret-jwt-key-change-this-in-production
 NODE_ENV=production
