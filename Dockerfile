@@ -28,6 +28,7 @@ EXPOSE 10000
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=10000
+ENV LOG_LEVEL=info
 
 # Start the application
 CMD ["pnpm", "start"]
