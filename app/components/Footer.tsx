@@ -26,22 +26,22 @@ export default function Footer() {
             <h4 className="font-semibold mb-4 text-sunrise-200">Product</h4>
             <ul className="space-y-3 text-mist-400">
               <li>
-                <Link href="/companions" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/companions" className="hover:text-sunrise-200 transition-colors">
                   Meet Companions
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/pricing" className="hover:text-sunrise-200 transition-colors">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/how-it-works" className="hover:text-sunrise-200 transition-colors">
                   How it Works
                 </Link>
               </li>
               <li>
-                <Link href="/safety" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/safety" className="hover:text-sunrise-200 transition-colors">
                   Safety
                 </Link>
               </li>
@@ -53,22 +53,22 @@ export default function Footer() {
             <h4 className="font-semibold mb-4 text-sunrise-200">Support</h4>
             <ul className="space-y-3 text-mist-400">
               <li>
-                <Link href="/help" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/help" className="hover:text-sunrise-200 transition-colors">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/contact" className="hover:text-sunrise-200 transition-colors">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/safety#crisis-resources" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/safety#crisis-resources" className="hover:text-sunrise-200 transition-colors">
                   Crisis Resources
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/about" className="hover:text-sunrise-200 transition-colors">
                   About Us
                 </Link>
               </li>
@@ -80,17 +80,17 @@ export default function Footer() {
             <h4 className="font-semibold mb-4 text-sunrise-200">Legal</h4>
             <ul className="space-y-3 text-mist-400">
               <li>
-                <Link href="/terms" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/terms" className="hover:text-sunrise-200 transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/privacy" className="hover:text-sunrise-200 transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/acceptable-use" className="hover:text-sunrise-200 transition-colors">
+                <Link to="/acceptable-use" className="hover:text-sunrise-200 transition-colors">
                   Acceptable Use
                 </Link>
               </li>
