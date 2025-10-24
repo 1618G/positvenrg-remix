@@ -89,14 +89,14 @@ export default function Chat() {
     }
   }, [actionData]);
 
-  // Simulate typing indicator
+  // Only show typing indicator during actual submission, not after response
   useEffect(() => {
-    if (isSubmitting) {
+    if (isSubmitting && !actionData) {
       setIsTyping(true);
-      const timer = setTimeout(() => setIsTyping(false), 2000);
-      return () => clearTimeout(timer);
+    } else {
+      setIsTyping(false);
     }
-  }, [isSubmitting]);
+  }, [isSubmitting, actionData]);
 
   // Quick action handlers
   const handleQuickAction = (message: string) => {
@@ -211,8 +211,8 @@ export default function Chat() {
             </>
           )}
           
-          {/* Typing Indicator */}
-          {isTyping && (
+          {/* Typing Indicator - Only show when actually typing, not after response */}
+          {isTyping && !actionData && (
             <div className="flex justify-start">
               <div className="max-w-3xl">
                 <div className="bg-white rounded-2xl rounded-tl-lg p-6 shadow-sm border border-gray-200">
