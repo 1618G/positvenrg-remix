@@ -11,7 +11,7 @@
   }
   
   body {
-    @apply bg-cosmic-50 text-cosmic-900;
+    @apply bg-nojever-50 text-nojever-900;
     font-feature-settings: 'kern' 1, 'liga' 1;
   }
 
@@ -23,77 +23,77 @@
 }
 
 @layer components {
-  /* Button Styles - Cosmic & Mystical */
+  /* Button Styles - Nojever Brand */
   .btn-primary {
-    @apply bg-cosmic-gradient hover:shadow-cosmic text-cosmic-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply bg-nojever-gradient hover:shadow-nojever text-nojever-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 600;
   }
   
   .btn-secondary {
-    @apply bg-electric-200 hover:bg-electric-300 text-cosmic-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply bg-electric-200 hover:bg-electric-300 text-nojever-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 600;
   }
 
   .btn-ghost {
-    @apply bg-transparent hover:bg-electric-100 text-cosmic-700 font-medium py-3 px-6 rounded-2xl transition-all duration-300;
+    @apply bg-transparent hover:bg-electric-100 text-nojever-700 font-medium py-3 px-6 rounded-2xl transition-all duration-300;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 500;
   }
   
-  /* Card Styles - Cosmic & Mystical */
+  /* Card Styles - Nojever Brand */
   .card {
-    @apply bg-white rounded-3xl shadow-cosmic border border-cosmic-200 p-8 transition-all duration-300 hover:shadow-electric;
+    @apply bg-white rounded-3xl shadow-nojever border border-nojever-200 p-8 transition-all duration-300 hover:shadow-nojever-primary;
   }
 
   .card-character {
-    @apply bg-white rounded-3xl shadow-cosmic border border-cosmic-200 p-6 transition-all duration-300 hover:shadow-fire hover:scale-105 cursor-pointer;
+    @apply bg-white rounded-3xl shadow-nojever border border-nojever-200 p-6 transition-all duration-300 hover:shadow-nojever-accent hover:scale-105 cursor-pointer;
   }
   
-  /* Input Styles - Cosmic & Accessible */
+  /* Input Styles - Nojever Brand */
   .input {
-    @apply w-full px-4 py-3 border border-cosmic-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-electric-500 focus:border-electric-500 transition-all duration-300;
+    @apply w-full px-4 py-3 border border-nojever-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-electric-500 focus:border-electric-500 transition-all duration-300;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .input:focus {
-    @apply shadow-electric;
+    @apply shadow-nojever-primary;
   }
   
   /* Typography Styles */
   .heading-xl {
-    @apply text-4xl md:text-6xl font-bold text-cosmic-900;
+    @apply text-4xl md:text-6xl font-bold text-nojever-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.1;
   }
 
   .heading-lg {
-    @apply text-3xl md:text-4xl font-semibold text-cosmic-900;
+    @apply text-3xl md:text-4xl font-semibold text-nojever-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.2;
   }
 
   .heading-md {
-    @apply text-2xl md:text-3xl font-semibold text-cosmic-900;
+    @apply text-2xl md:text-3xl font-semibold text-nojever-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.3;
   }
 
   .text-body {
-    @apply text-lg text-cosmic-700 leading-relaxed;
+    @apply text-lg text-nojever-700 leading-relaxed;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .text-accent {
-    @apply text-cosmic-600;
+    @apply text-nojever-600;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 500;
   }
 
   /* Special Components */
   .gradient-text {
-    @apply bg-cosmic-gradient bg-clip-text text-transparent;
+    @apply bg-nojever-gradient bg-clip-text text-transparent;
   }
 
   .safe-space-banner {

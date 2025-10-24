@@ -17,7 +17,7 @@ export default function Index() {
   const { companions } = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-cosmic-50">
+    <div className="min-h-screen bg-nojever-50">
       {/* Navigation */}
       <Navigation />
 
@@ -32,7 +32,7 @@ export default function Index() {
           <div className="text-center fade-in">
             <h1 className="heading-xl mb-8">
               No Judgement Ever —<br />
-              <span className="gradient-text">Find a Friend, Find Your PositiveNRG</span>
+              <span className="gradient-text">Find Your AI Companion</span>
             </h1>
             <p className="text-body mb-12 max-w-4xl mx-auto">
               Interactive AI companions that listen, support, and uplift — anytime you need them. 
@@ -40,10 +40,10 @@ export default function Index() {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
               <Link href="/companions" className="btn-primary text-lg px-8 py-4">
-                Meet PositiveNRG
+                Meet Your Companions
               </Link>
               <Link href="/companions" className="btn-secondary text-lg px-8 py-4">
-                Browse Companions
+                Browse All Companions
               </Link>
             </div>
 
@@ -65,13 +65,13 @@ export default function Index() {
         </div>
       </main>
 
-      {/* Why PositiveNRG Section */}
+      {/* Why Nojever Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="heading-lg mb-6">You deserve a safe space</h2>
             <p className="text-body max-w-3xl mx-auto">
-              Our avatars are built to listen, encourage, and keep you company. 
+              Our AI companions are built to listen, encourage, and keep you company. 
               Whether it's sharing your thoughts, calming your mind, or just chatting, we're here — without judgement.
             </p>
           </div>

@@ -20,6 +20,8 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Nojever - AI Companions for Mental Wellness</title>
+        <meta name="description" content="Nojever provides AI companions for mental wellness, offering support, guidance, and therapeutic conversations." />
         <Meta />
         <Links />
       </head>

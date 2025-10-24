@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Cosmic Color Palette - Inspired by the Divine Duality Image
-        cosmic: {
-          // Deep cosmic dark (background)
+        // Nojever Color Palette - Modern, clean, and professional
+        nojever: {
+          // Primary Nojever brand colors
           50: '#f8fafc',
           100: '#f1f5f9',
           200: '#e2e8f0',
@@ -196,27 +196,27 @@ export default {
         '3xl': '24px',
       },
       boxShadow: {
-        'cosmic': '0 20px 25px -5px rgba(14, 165, 233, 0.1), 0 10px 10px -5px rgba(14, 165, 233, 0.04)',
-        'electric': '0 10px 15px -3px rgba(14, 165, 233, 0.1), 0 4px 6px -2px rgba(14, 165, 233, 0.05)',
-        'fire': '0 10px 15px -3px rgba(249, 115, 22, 0.1), 0 4px 6px -2px rgba(249, 115, 22, 0.05)',
-        'ethereal': '0 4px 6px -1px rgba(240, 249, 255, 0.1), 0 2px 4px -1px rgba(240, 249, 255, 0.06)',
-        'mystical': '0 20px 25px -5px rgba(168, 85, 247, 0.1), 0 10px 10px -5px rgba(168, 85, 247, 0.04)',
-        'nebula': '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+        'nojever': '0 20px 25px -5px rgba(14, 165, 233, 0.1), 0 10px 10px -5px rgba(14, 165, 233, 0.04)',
+        'nojever-primary': '0 10px 15px -3px rgba(14, 165, 233, 0.1), 0 4px 6px -2px rgba(14, 165, 233, 0.05)',
+        'nojever-secondary': '0 10px 15px -3px rgba(100, 116, 139, 0.1), 0 4px 6px -2px rgba(100, 116, 139, 0.05)',
+        'nojever-accent': '0 4px 6px -1px rgba(45, 212, 191, 0.1), 0 2px 4px -1px rgba(45, 212, 191, 0.06)',
+        'nojever-professional': '0 20px 25px -5px rgba(51, 65, 85, 0.1), 0 10px 10px -5px rgba(51, 65, 85, 0.04)',
+        'nojever-elevated': '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
         // Legacy shadows for compatibility
         'soft': '0 2px 8px rgba(0, 0, 0, 0.08)',
         'warm': '0 4px 16px rgba(255, 184, 140, 0.15)',
         'sunrise': '0 4px 16px rgba(255, 232, 124, 0.2)',
       },
       backgroundImage: {
-        // Cosmic gradients inspired by the divine duality image
-        'cosmic-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 50%, #f97316 100%)',
-        'electric-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #7dd3fc 100%)',
-        'fire-gradient': 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
-        'passion-gradient': 'linear-gradient(135deg, #ef4444 0%, #f97316 50%, #fbbf24 100%)',
-        'ethereal-gradient': 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%)',
-        'mystical-gradient': 'linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #d8b4fe 100%)',
-        'cosmic-duality': 'linear-gradient(90deg, #0ea5e9 0%, #2dd4bf 25%, #f97316 75%, #ef4444 100%)',
-        'nebula-gradient': 'linear-gradient(45deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%)',
+        // Nojever brand gradients - clean and professional
+        'nojever-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 50%, #64748b 100%)',
+        'nojever-primary': 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #7dd3fc 100%)',
+        'nojever-secondary': 'linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%)',
+        'nojever-accent': 'linear-gradient(135deg, #2dd4bf 0%, #14b8a6 50%, #0d9488 100%)',
+        'nojever-neutral': 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+        'nojever-dark': 'linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%)',
+        'nojever-brand': 'linear-gradient(90deg, #0ea5e9 0%, #2dd4bf 25%, #64748b 75%, #334155 100%)',
+        'nojever-professional': 'linear-gradient(45deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%)',
         // Legacy gradients for compatibility
         'sunrise-gradient': 'linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fbbf24 100%)',
         'warm-gradient': 'linear-gradient(135deg, #f97316 0%, #f59e0b 50%, #d97706 100%)',
