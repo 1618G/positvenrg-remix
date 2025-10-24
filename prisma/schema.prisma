@@ -34,6 +34,10 @@ model Companion {
   description String?
   personality String?
   avatar      String?
+  tagline     String?  // Short tagline for the companion
+  mood        String?  // Mood category (Cheerful, Calm, Motivational, etc.)
+  color       String?  // Primary color theme
+  isPremium   Boolean  @default(false) // Whether this is a premium companion
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

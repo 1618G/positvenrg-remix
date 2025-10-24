@@ -11,7 +11,7 @@
   }
   
   body {
-    @apply bg-yellow-50 text-gray-900;
+    @apply bg-sunrise-50 text-charcoal-900;
     font-feature-settings: 'kern' 1, 'liga' 1;
   }
 
@@ -25,88 +25,88 @@
 @layer components {
   /* Button Styles - Warm & Inviting */
   .btn-primary {
-    @apply bg-gradient-to-r from-yellow-400 to-orange-400 hover:shadow-lg text-gray-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply bg-sunrise-gradient hover:shadow-warm text-charcoal-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 600;
   }
   
   .btn-secondary {
-    @apply bg-green-200 hover:bg-green-300 text-gray-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply bg-pastel-200 hover:bg-pastel-300 text-charcoal-900 font-medium py-3 px-6 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 600;
   }
 
   .btn-ghost {
-    @apply bg-transparent hover:bg-yellow-100 text-gray-700 font-medium py-3 px-6 rounded-2xl transition-all duration-300;
+    @apply bg-transparent hover:bg-sunrise-100 text-charcoal-700 font-medium py-3 px-6 rounded-2xl transition-all duration-300;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 500;
   }
   
   /* Card Styles - Soft & Welcoming */
   .card {
-    @apply bg-white rounded-3xl shadow-lg border border-yellow-100 p-8 transition-all duration-300 hover:shadow-xl;
+    @apply bg-white rounded-3xl shadow-soft border border-sunrise-100 p-8 transition-all duration-300 hover:shadow-warm;
   }
 
   .card-character {
-    @apply bg-white rounded-3xl shadow-lg border border-yellow-100 p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer;
+    @apply bg-white rounded-3xl shadow-soft border border-sunrise-100 p-6 transition-all duration-300 hover:shadow-sunrise hover:scale-105 cursor-pointer;
   }
   
   /* Input Styles - Gentle & Accessible */
   .input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-200 transition-all duration-300;
+    @apply w-full px-4 py-3 border border-mist-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sunrise-200 focus:border-sunrise-200 transition-all duration-300;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .input:focus {
-    @apply shadow-lg;
+    @apply shadow-soft;
   }
   
   /* Typography Styles */
   .heading-xl {
-    @apply text-4xl md:text-6xl font-bold text-gray-900;
+    @apply text-4xl md:text-6xl font-bold text-charcoal-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.1;
   }
 
   .heading-lg {
-    @apply text-3xl md:text-4xl font-semibold text-gray-900;
+    @apply text-3xl md:text-4xl font-semibold text-charcoal-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.2;
   }
 
   .heading-md {
-    @apply text-2xl md:text-3xl font-semibold text-gray-900;
+    @apply text-2xl md:text-3xl font-semibold text-charcoal-900;
     font-family: 'Poppins', system-ui, sans-serif;
     line-height: 1.3;
   }
 
   .text-body {
-    @apply text-lg text-gray-700 leading-relaxed;
+    @apply text-lg text-charcoal-700 leading-relaxed;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .text-accent {
-    @apply text-gray-600;
+    @apply text-charcoal-600;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 500;
   }
 
   /* Special Components */
   .gradient-text {
-    @apply bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent;
+    @apply bg-sunrise-gradient bg-clip-text text-transparent;
   }
 
   .safe-space-banner {
-    @apply bg-green-50 border-l-4 border-green-200 p-6 rounded-2xl;
+    @apply bg-pastel-50 border-l-4 border-pastel-200 p-6 rounded-2xl;
   }
 
   .crisis-resources {
-    @apply bg-orange-50 border border-orange-200 rounded-2xl p-6;
+    @apply bg-peach-50 border border-peach-200 p-4 rounded-xl;
   }
 
   /* Avatar/Character Styles */
   .avatar-frame {
-    @apply w-20 h-20 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 p-1 shadow-lg;
+    @apply w-20 h-20 rounded-full overflow-hidden border-4 border-sunrise-200;
   }
 
   .character-portrait {
@@ -128,7 +128,7 @@
 
   /* Navigation */
   .nav-link {
-    @apply text-gray-700 hover:text-yellow-600 font-medium transition-colors duration-300;
+    @apply text-charcoal-700 hover:text-sunrise-600 font-medium transition-colors duration-300;
     font-family: 'Nunito', system-ui, sans-serif;
   }
 

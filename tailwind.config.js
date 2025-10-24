@@ -86,6 +86,8 @@ export default {
         'sunrise-gradient': 'linear-gradient(135deg, #FFE87C 0%, #FFB88C 50%, #A8E6A1 100%)',
         'warm-gradient': 'linear-gradient(135deg, #FFE87C 0%, #FFB88C 100%)',
         'calm-gradient': 'linear-gradient(135deg, #A8E6A1 0%, #FFE87C 100%)',
+        'pastel-gradient': 'linear-gradient(135deg, #A8E6A1 0%, #86EFAC 100%)',
+        'peach-gradient': 'linear-gradient(135deg, #FFB88C 0%, #FF9A6B 100%)',
       },
     },
   },

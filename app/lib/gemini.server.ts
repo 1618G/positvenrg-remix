@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { aiLogger } from "./logger.server";
+import { apiClient } from "./api.client";
 
+// Initialize Gemini AI (fallback for direct usage)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function generateResponse(
@@ -8,40 +10,46 @@ export async function generateResponse(
   companionPersonality?: string,
   chatHistory: Array<{ role: "user" | "assistant"; content: string }> = []
 ) {
-  const startTime = Date.now();
-  
+  // Use the new API client for better error handling and logging
   try {
-    const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
-
-    const systemPrompt = companionPersonality 
-      ? `You are a positive energy companion with the following personality: ${companionPersonality}. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.`
-      : "You are a positive energy companion. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.";
-
-    // Build conversation history
-    const conversationHistory = [
-      { role: "user", parts: [{ text: systemPrompt }] },
-      ...chatHistory.map(msg => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }]
-      })),
-      { role: "user", parts: [{ text: message }] }
-    ];
-
-    const result = await model.generateContent({
-      contents: conversationHistory as any,
-    });
-
-    const response = await result.response;
-    const responseText = response.text();
-    
-    const duration = Date.now() - startTime;
-    aiLogger.response('unknown', 'unknown', responseText.length, duration);
-    
-    return responseText;
+    return await apiClient.generateGeminiResponse(message, companionPersonality, chatHistory);
   } catch (error) {
-    const duration = Date.now() - startTime;
-    aiLogger.error('unknown', 'unknown', error instanceof Error ? error.message : 'Unknown error');
-    return "I'm sorry, I'm having trouble processing your message right now. Please try again.";
+    // Fallback to direct Gemini API if API client fails
+    const startTime = Date.now();
+    
+    try {
+      const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
+
+      const systemPrompt = companionPersonality 
+        ? `You are a positive energy companion with the following personality: ${companionPersonality}. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.`
+        : "You are a positive energy companion. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.";
+
+      // Build conversation history
+      const conversationHistory = [
+        { role: "user", parts: [{ text: systemPrompt }] },
+        ...chatHistory.map(msg => ({
+          role: msg.role === "user" ? "user" : "model",
+          parts: [{ text: msg.content }]
+        })),
+        { role: "user", parts: [{ text: message }] }
+      ];
+
+      const result = await model.generateContent({
+        contents: conversationHistory as any,
+      });
+
+      const response = await result.response;
+      const responseText = response.text();
+      
+      const duration = Date.now() - startTime;
+      aiLogger.response('unknown', 'unknown', responseText.length, duration);
+      
+      return responseText;
+    } catch (fallbackError) {
+      const duration = Date.now() - startTime;
+      aiLogger.error('unknown', 'unknown', fallbackError instanceof Error ? fallbackError.message : 'Unknown error');
+      return "I'm sorry, I'm having trouble processing your message right now. Please try again.";
+    }
   }
 }
 

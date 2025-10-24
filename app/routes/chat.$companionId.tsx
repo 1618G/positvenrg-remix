@@ -1,8 +1,10 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useActionData, useNavigation } from "@remix-run/react";
+import { Form, useLoaderData, useActionData, useNavigation, Link } from "@remix-run/react";
 import { db } from "~/lib/db.server";
 import { verifyUserSession, getUserById } from "~/lib/auth.server";
 import { generateCompanionResponse } from "~/lib/gemini.server";
+import Navigation from "~/components/Navigation";
+import Footer from "~/components/Footer";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -166,111 +168,197 @@ export default function Chat() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8", minHeight: "100vh", background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)", padding: "2rem" }}>
-      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-        <div style={{ background: "white", borderRadius: "1rem", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", overflow: "hidden" }}>
-          {/* Chat Header */}
-          <div style={{ background: "#3b82f6", color: "white", padding: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span style={{ fontSize: "3rem", marginRight: "1rem" }}>{companion.avatar}</span>
+    <div className="min-h-screen bg-sunrise-50">
+      <Navigation />
+
+      {/* Chat Header */}
+      <section className="py-8 bg-sunrise-gradient">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4 shadow-soft">
+                <span className="text-3xl">{companion.avatar}</span>
+              </div>
               <div>
-                <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "0.25rem" }}>{companion.name}</h1>
-                <p style={{ color: "rgba(255,255,255,0.8)" }}>{companion.description}</p>
+                <h1 className="heading-lg text-charcoal-900 mb-2">{companion.name}</h1>
+                <p className="text-body text-charcoal-700">{companion.description}</p>
+                {companion.personality && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {companion.personality.split(',').slice(0, 3).map((trait, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-white/20 text-charcoal-800 text-sm rounded-full font-medium"
+                      >
+                        {trait.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
+            <Link to="/dashboard" className="btn-ghost bg-white/20 text-charcoal-900 hover:bg-white/30">
+              ← Back to Dashboard
+            </Link>
           </div>
+        </div>
+      </section>
 
-          {/* Messages */}
-          <div style={{ height: "400px", overflowY: "auto", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {chat.messages.length === 0 && (
-              <div style={{ display: "flex", justifyContent: "start" }}>
-                <div style={{ background: "#f3f4f6", color: "#1f2937", maxWidth: "300px", padding: "0.75rem 1rem", borderRadius: "1rem" }}>
-                  <p style={{ fontSize: "0.875rem", margin: 0 }}>Hello! I'm {companion.name}, {companion.description?.toLowerCase() || "your AI companion"}. How are you feeling today?</p>
-                  <p style={{ fontSize: "0.75rem", opacity: 0.7, margin: "0.25rem 0 0 0" }}>Just now</p>
+      {/* Chat Interface */}
+      <section className="py-8 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="card overflow-hidden">
+            {/* Messages Area */}
+            <div className="h-96 overflow-y-auto p-6 space-y-4 bg-sunrise-50">
+              {chat.messages.length === 0 && (
+                <div className="flex justify-start">
+                  <div className="max-w-xs lg:max-w-md">
+                    <div className="bg-white rounded-2xl rounded-tl-sm p-4 shadow-soft">
+                      <div className="flex items-center mb-2">
+                        <div className="w-8 h-8 bg-sunrise-gradient rounded-full flex items-center justify-center mr-3">
+                          <span className="text-sm">{companion.avatar}</span>
+                        </div>
+                        <span className="font-semibold text-charcoal-900 text-sm">{companion.name}</span>
+                      </div>
+                      <p className="text-body text-charcoal-700 mb-2">
+                        Hello! I'm {companion.name}, {companion.description?.toLowerCase() || "your AI companion"}. 
+                        How are you feeling today?
+                      </p>
+                      <p className="text-xs text-charcoal-500">Just now</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
-            
-            {chat.messages.map((message) => (
-              <div
-                key={message.id}
-                style={{ display: "flex", justifyContent: message.role === "USER" ? "end" : "start" }}
-              >
+              )}
+              
+              {chat.messages.map((message) => (
                 <div
-                  style={{
-                    background: message.role === "USER" ? "#3b82f6" : "#f3f4f6",
-                    color: message.role === "USER" ? "white" : "#1f2937",
-                    maxWidth: "300px",
-                    padding: "0.75rem 1rem",
-                    borderRadius: "1rem"
-                  }}
+                  key={message.id}
+                  className={`flex ${message.role === "USER" ? "justify-end" : "justify-start"}`}
                 >
-                  <p style={{ fontSize: "0.875rem", margin: 0 }}>{message.content}</p>
-                  <p style={{ fontSize: "0.75rem", opacity: 0.7, margin: "0.25rem 0 0 0" }}>
-                    {new Date(message.createdAt).toLocaleTimeString()}
-                  </p>
+                  <div className={`max-w-xs lg:max-w-md ${message.role === "USER" ? "order-2" : "order-1"}`}>
+                    <div className={`rounded-2xl p-4 shadow-soft ${
+                      message.role === "USER" 
+                        ? "bg-sunrise-gradient text-charcoal-900 rounded-br-sm" 
+                        : "bg-white text-charcoal-700 rounded-tl-sm"
+                    }`}>
+                      {message.role === "ASSISTANT" && (
+                        <div className="flex items-center mb-2">
+                          <div className="w-6 h-6 bg-sunrise-gradient rounded-full flex items-center justify-center mr-2">
+                            <span className="text-xs">{companion.avatar}</span>
+                          </div>
+                          <span className="font-semibold text-charcoal-900 text-sm">{companion.name}</span>
+                        </div>
+                      )}
+                      <p className="text-body mb-2">{message.content}</p>
+                      <p className={`text-xs ${message.role === "USER" ? "text-charcoal-700" : "text-charcoal-500"}`}>
+                        {new Date(message.createdAt).toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
-            
-            {isSubmitting && (
-              <div style={{ display: "flex", justifyContent: "start" }}>
-                <div style={{ background: "#f3f4f6", color: "#1f2937", maxWidth: "300px", padding: "0.75rem 1rem", borderRadius: "1rem" }}>
-                  <p style={{ fontSize: "0.875rem", margin: 0 }}>Thinking...</p>
+              ))}
+              
+              {isSubmitting && (
+                <div className="flex justify-start">
+                  <div className="max-w-xs lg:max-w-md">
+                    <div className="bg-white rounded-2xl rounded-tl-sm p-4 shadow-soft">
+                      <div className="flex items-center mb-2">
+                        <div className="w-6 h-6 bg-sunrise-gradient rounded-full flex items-center justify-center mr-2">
+                          <span className="text-xs">{companion.avatar}</span>
+                        </div>
+                        <span className="font-semibold text-charcoal-900 text-sm">{companion.name}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-sunrise-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-sunrise-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-sunrise-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                        <span className="text-sm text-charcoal-600">Thinking...</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Message Input */}
-          <div style={{ borderTop: "1px solid #e5e7eb", padding: "1.5rem" }}>
-            <Form method="post" style={{ display: "flex", gap: "1rem" }}>
-              <input
-                type="text"
-                name="message"
-                placeholder="Type your message..."
-                required
-                style={{
-                  flex: 1,
-                  padding: "0.75rem 1rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem"
-                }}
-              />
+            {/* Message Input */}
+            <div className="border-t border-sunrise-100 p-6 bg-white">
+              <Form method="post" className="flex gap-4">
+                <input
+                  type="text"
+                  name="message"
+                  placeholder="Type your message..."
+                  required
+                  className="input flex-1"
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`btn-primary px-6 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-charcoal-900 border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Sending...
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                      Send
+                    </div>
+                  )}
+                </button>
+              </Form>
+              
+              {actionData?.error && (
+                <div className="mt-4 p-3 bg-peach-50 border border-peach-200 rounded-lg">
+                  <p className="text-sm text-peach-800">{actionData.error}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Conversation Starters */}
+      <section className="py-8 bg-sunrise-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-6">
+            <h3 className="heading-md mb-4">Need some inspiration?</h3>
+            <p className="text-body">Try these conversation starters</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              "How are you feeling today?",
+              "I need some motivation",
+              "Can you help me relax?",
+              "I want to talk about my goals",
+              "I'm feeling stressed",
+              "Tell me something positive"
+            ].map((starter, index) => (
               <button
-                type="submit"
-                disabled={isSubmitting}
-                style={{
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                  padding: "0.75rem 1.5rem",
-                  borderRadius: "0.5rem",
-                  fontWeight: "600",
-                  border: "none",
-                  cursor: isSubmitting ? "not-allowed" : "pointer",
-                  opacity: isSubmitting ? 0.5 : 1
+                key={index}
+                className="card text-left hover:shadow-warm transition-all duration-300 p-4"
+                onClick={() => {
+                  const input = document.querySelector('input[name="message"]') as HTMLInputElement;
+                  if (input) {
+                    input.value = starter;
+                    input.focus();
+                  }
                 }}
               >
-                {isSubmitting ? "Sending..." : "Send"}
+                <p className="text-body text-charcoal-700">{starter}</p>
               </button>
-            </Form>
+            ))}
           </div>
         </div>
+      </section>
 
-        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
-          <a
-            href="/dashboard"
-            style={{
-              color: "#3b82f6",
-              textDecoration: "none",
-              fontWeight: "600"
-            }}
-          >
-            ← Back to Dashboard
-          </a>
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }

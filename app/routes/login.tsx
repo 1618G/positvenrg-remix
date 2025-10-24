@@ -1,6 +1,8 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
 import { verifyLogin, createUserSession } from "~/lib/auth.server";
+import Navigation from "~/components/Navigation";
+import Footer from "~/components/Footer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   // Check if user is already logged in
@@ -51,66 +53,141 @@ export default function Login() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
-        </div>
+    <div className="min-h-screen bg-sunrise-50">
+      <Navigation />
 
-        <Form method="post" className="space-y-6">
-          {actionData?.error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {actionData.error}
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your email"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isSubmitting ? "Signing in..." : "Sign In"}
-          </button>
-        </Form>
-
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
-              Sign up
-            </Link>
+      {/* Hero Section */}
+      <section className="py-16 bg-sunrise-gradient">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="heading-xl mb-6 text-charcoal-900">
+            Welcome Back
+          </h1>
+          <p className="text-body text-charcoal-700 max-w-2xl mx-auto">
+            Sign in to continue your positive energy journey with your AI companions
           </p>
         </div>
-      </div>
+      </section>
+
+      {/* Login Form */}
+      <section className="py-16 bg-white">
+        <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="card">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-sunrise-gradient rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-charcoal-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h2 className="heading-md mb-2">Sign In</h2>
+              <p className="text-body text-charcoal-600">
+                Access your account to chat with your AI companions
+              </p>
+            </div>
+
+            <Form method="post" className="space-y-6">
+              {actionData?.error && (
+                <div className="bg-peach-50 border border-peach-200 text-peach-800 px-4 py-3 rounded-xl">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {actionData.error}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-charcoal-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  className="input"
+                  placeholder="Enter your email address"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-charcoal-700 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  className="input"
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`btn-primary w-full ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-charcoal-900 border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Signing in...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Sign In
+                  </div>
+                )}
+              </button>
+            </Form>
+
+            <div className="mt-8 text-center">
+              <p className="text-body text-charcoal-600">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-sunrise-600 hover:text-sunrise-700 font-semibold transition-colors">
+                  Create one here
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Additional Info */}
+          <div className="mt-8 text-center">
+            <div className="bg-pastel-50 border border-pastel-200 rounded-2xl p-6">
+              <h3 className="heading-md mb-3 text-pastel-800">New to PositiveNRG?</h3>
+              <p className="text-body text-pastel-700 mb-4">
+                Join thousands of users who have found their positive energy with our AI companions.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-sm">
+                <div className="flex items-center text-pastel-700">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Free to start
+                </div>
+                <div className="flex items-center text-pastel-700">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  AI companions
+                </div>
+                <div className="flex items-center text-pastel-700">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Safe & secure
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }
