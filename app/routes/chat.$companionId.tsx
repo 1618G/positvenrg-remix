@@ -145,34 +145,32 @@ export default function Chat() {
       <div className="flex-1 flex flex-col min-h-0">
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-          {/* Welcome Message */}
-          {chat.messages.length === 0 && !actionData && (
-            <div className="flex justify-start">
-              <div className="max-w-3xl">
-                <div className="bg-white rounded-2xl rounded-tl-lg p-6 shadow-sm border border-gray-200">
-                  <div className="flex items-center mb-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-lg">{companion.avatar}</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-gray-900">{companion.name}</span>
-                      <p className="text-gray-500 text-sm">AI Companion</p>
-                    </div>
+          {/* Always show initial greeting message */}
+          <div className="flex justify-start">
+            <div className="max-w-3xl">
+              <div className="bg-white rounded-2xl rounded-tl-lg p-6 shadow-sm border border-gray-200">
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-lg">{companion.avatar}</span>
                   </div>
-                  <p className="text-gray-800 text-lg leading-relaxed">
-                    Hello! I'm {companion.name}, {companion.description?.toLowerCase() || "your AI companion"}. 
-                    How are you feeling today?
-                  </p>
-                  <div className="flex items-center space-x-2 text-gray-500 text-sm mt-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span>Just now</span>
+                  <div>
+                    <span className="font-semibold text-gray-900">{companion.name}</span>
+                    <p className="text-gray-500 text-sm">AI Companion</p>
                   </div>
+                </div>
+                <p className="text-gray-800 text-lg leading-relaxed">
+                  Hello! I'm {companion.name}, {companion.description?.toLowerCase() || "your AI companion"}. 
+                  How are you feeling today?
+                </p>
+                <div className="flex items-center space-x-2 text-gray-500 text-sm mt-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span>Just now</span>
                 </div>
               </div>
             </div>
-          )}
+          </div>
           
-          {/* Display action data responses */}
+          {/* Display conversation if there's action data */}
           {actionData?.userMessage && actionData?.aiResponse && (
             <>
               {/* User Message */}
