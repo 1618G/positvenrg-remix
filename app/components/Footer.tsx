@@ -2,21 +2,21 @@ import { Link } from "@remix-run/react";
 
 export default function Footer() {
   return (
-    <footer className="bg-cosmic-900 text-white py-16">
+    <footer className="bg-nojever-900 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div>
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-8 h-8 bg-cosmic-gradient rounded-full flex items-center justify-center shadow-electric">
-                <span className="text-white font-bold">P</span>
+              <div className="w-8 h-8 bg-nojever-gradient rounded-full flex items-center justify-center shadow-nojever">
+                <span className="text-white font-bold">N</span>
               </div>
-              <h3 className="text-xl font-bold">PositiveNRG</h3>
+              <h3 className="text-xl font-bold">Nojever</h3>
             </div>
-            <p className="text-cosmic-400 mb-4">
+            <p className="text-nojever-400 mb-4">
               AI companions for mental wellness with safety-first approach.
             </p>
-            <p className="text-sm text-cosmic-500">
+            <p className="text-sm text-nojever-500">
               No judgement, ever.
             </p>
           </div>
@@ -24,7 +24,7 @@ export default function Footer() {
           {/* Product Links */}
           <div>
             <h4 className="font-semibold mb-4 text-electric-200">Product</h4>
-            <ul className="space-y-3 text-cosmic-400">
+            <ul className="space-y-3 text-nojever-400">
               <li>
                 <Link to="/companions" className="hover:text-electric-200 transition-colors">
                   Meet Companions
@@ -51,7 +51,7 @@ export default function Footer() {
           {/* Support Links */}
           <div>
             <h4 className="font-semibold mb-4 text-electric-200">Support</h4>
-            <ul className="space-y-3 text-cosmic-400">
+            <ul className="space-y-3 text-nojever-400">
               <li>
                 <Link to="/help" className="hover:text-electric-200 transition-colors">
                   Help Center
@@ -78,7 +78,7 @@ export default function Footer() {
           {/* Legal Links */}
           <div>
             <h4 className="font-semibold mb-4 text-electric-200">Legal</h4>
-            <ul className="space-y-3 text-cosmic-400">
+            <ul className="space-y-3 text-nojever-400">
               <li>
                 <Link to="/terms" className="hover:text-electric-200 transition-colors">
                   Terms of Service
@@ -99,7 +99,7 @@ export default function Footer() {
         </div>
 
         {/* Crisis Resources Banner */}
-        <div className="mt-12 pt-8 border-t border-cosmic-800">
+        <div className="mt-12 pt-8 border-t border-nojever-800">
           <div className="bg-passion-900/20 border border-passion-700/30 rounded-lg p-6">
             <div className="flex items-start">
               <div className="flex-shrink-0">
@@ -136,8 +136,8 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-cosmic-800 text-center text-cosmic-500">
-          <p>&copy; 2024 PositiveNRG. All rights reserved. Built with empathy and care.</p>
+        <div className="mt-8 pt-8 border-t border-nojever-800 text-center text-nojever-500">
+          <p>&copy; 2024 Nojever. All rights reserved. Built with empathy and care.</p>
         </div>
       </div>
     </footer>

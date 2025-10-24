@@ -176,7 +176,7 @@ export default function Index() {
                 </h3>
                 <div className="text-body">
                   <p className="mb-4">
-                    PositiveNRG is not a replacement for professional mental health care. 
+                    Nojever is not a replacement for professional mental health care. 
                     If you're experiencing a mental health crisis, please contact:
                   </p>
                   <div className="crisis-resources">
