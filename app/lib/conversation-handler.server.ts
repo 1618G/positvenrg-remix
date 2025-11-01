@@ -41,6 +41,10 @@ export async function generateEnhancedCompanionResponse(
     // Get conversation context
     const context = await getConversationContext(chatId);
     
+    // Get onboarding data for personalization
+    const { getOnboardingData } = await import("./onboarding.server");
+    const onboardingData = await getOnboardingData(userId);
+    
     // Detect crisis first (safety priority)
     const crisisResult = await detectCrisis(message, userId, chatId);
     
@@ -73,12 +77,13 @@ export async function generateEnhancedCompanionResponse(
     // Get companion features
     const features = await getCompanionFeatures(companionId);
     
-    // Build enhanced system prompt
+    // Build enhanced system prompt with onboarding data
     const systemPrompt = buildEnhancedSystemPrompt(
       companion,
       context,
       knowledge,
-      features
+      features,
+      onboardingData
     );
     
     // Generate response using Gemini
@@ -142,7 +147,8 @@ function buildEnhancedSystemPrompt(
   companion: any,
   context: any,
   knowledge: any[],
-  features: any[]
+  features: any[],
+  onboardingData?: any
 ): string {
   let prompt = `You are ${companion.name}, ${companion.description}. ${companion.systemPrompt || companion.personality}
 
@@ -152,9 +158,16 @@ PERSONALITY & APPROACH:
 - ${companion.personality}
 - Always maintain a warm, empathetic, and non-judgmental tone
 - Use active listening and validation techniques
-- Provide evidence-based support when appropriate
+- Provide evidence-based support when appropriate`;
 
-CONVERSATION CONTEXT:`;
+  // Add personalized communication style from onboarding
+  if (onboardingData) {
+    const styleGuidance = getCommunicationStyleGuidance(onboardingData);
+    prompt += `\n\nCOMMUNICATION STYLE (User Preferences):
+${styleGuidance}`;
+  }
+
+  prompt += `\n\nCONVERSATION CONTEXT:`;
 
   // Add conversation summary if available
   if (context.summary) {
@@ -166,10 +179,26 @@ CONVERSATION CONTEXT:`;
   
   // Add user preferences if available
   if (context.userPreferences) {
+    const prefs = context.userPreferences.preferences || {};
+    const triggers = context.userPreferences.triggers || [];
+    const goals = context.userPreferences.goals || {};
+    
     prompt += `
-- User preferences: ${JSON.stringify(context.userPreferences.preferences)}
-- Known triggers: ${JSON.stringify(context.userPreferences.triggers)}
-- User goals: ${JSON.stringify(context.userPreferences.goals)}`;
+- Communication style: ${prefs.communicationStyle || 'not specified'}
+- Response length preference: ${prefs.responseLength || 'moderate'}
+- Formality level: ${prefs.formality || 'casual'}`;
+    
+    if (triggers && triggers.length > 0) {
+      prompt += `\n- IMPORTANT: Known triggers to avoid: ${triggers.join(', ')}`;
+    }
+    
+    if (goals.goals) {
+      prompt += `\n- User's goals: ${goals.goals}`;
+    }
+    
+    if (goals.primaryNeeds && Array.isArray(goals.primaryNeeds) && goals.primaryNeeds.length > 0) {
+      prompt += `\n- Primary support needs: ${goals.primaryNeeds.join(', ')}`;
+    }
   }
   
   // Add specialized knowledge
@@ -186,6 +215,16 @@ SPECIALIZED FEATURES YOU CAN OFFER:
 ${features.map(f => `- ${f.name}: ${f.description}`).join('\n')}`;
   }
   
+  // Add response length guidance from onboarding
+  if (onboardingData?.responseLength) {
+    const lengthGuidance = {
+      brief: "Keep responses concise (1-2 sentences). Be direct and to the point.",
+      moderate: "Provide balanced responses (2-4 sentences). Include context but stay focused.",
+      detailed: "Provide comprehensive responses (4+ sentences). Include examples and context when helpful."
+    };
+    prompt += `\n\nRESPONSE LENGTH: ${lengthGuidance[onboardingData.responseLength as keyof typeof lengthGuidance] || lengthGuidance.moderate}`;
+  }
+
   prompt += `
 
 RESPONSE GUIDELINES:
@@ -197,10 +236,33 @@ RESPONSE GUIDELINES:
 6. If you detect crisis indicators, prioritize safety resources
 7. Keep responses conversational but therapeutic in nature
 8. Validate emotions and provide hope when appropriate
+9. ${onboardingData?.triggers && onboardingData.triggers.length > 0 
+    ? `AVOID these sensitive topics: ${onboardingData.triggers.join(', ')}. Be especially careful around these areas.`
+    : 'Be mindful of sensitive topics and approach with care.'}
 
 Remember: You are a supportive AI companion, not a replacement for professional therapy. Always encourage professional help when appropriate.`;
   
   return prompt;
+}
+
+function getCommunicationStyleGuidance(onboardingData: any): string {
+  const style = onboardingData.communicationStyle;
+  const formality = onboardingData.formality;
+  
+  const styleGuidance = {
+    direct: "Be straightforward and clear. Avoid excessive pleasantries. Get to the point while remaining respectful.",
+    gentle: "Use soft language. Be very empathetic and patient. Allow space for processing. Validate frequently.",
+    encouraging: "Maintain positive energy. Focus on motivation and hope. Celebrate small wins. Use uplifting language.",
+    listening: "Prioritize reflection and validation. Ask thoughtful questions. Mirror the user's feelings. Avoid giving unsolicited advice."
+  };
+  
+  const formalityGuidance = {
+    casual: "Use casual, friendly language. You can use contractions. Feel free to be conversational.",
+    professional: "Use respectful, professional language. Maintain appropriate boundaries. Be courteous and formal.",
+    friendly: "Use warm, friendly language while maintaining professionalism. Balance approachability with respect."
+  };
+  
+  return `${styleGuidance[style as keyof typeof styleGuidance] || styleGuidance.gentle}\n${formalityGuidance[formality as keyof typeof formalityGuidance] || formalityGuidance.friendly}`;
 }
 
 export async function analyzeConversationFlow(

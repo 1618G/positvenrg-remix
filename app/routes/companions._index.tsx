@@ -130,8 +130,11 @@ export default function CompanionsPage() {
                     to={`/chat/${companion.id}`}
                     className="btn-primary w-full"
                   >
-                    Chat Now
+                    Try Free (10 conversations)
                   </Link>
+                  <p className="text-xs text-charcoal-500 mt-2">
+                    No signup required to start
+                  </p>
                 </div>
               </div>
             ))}
@@ -143,10 +146,10 @@ export default function CompanionsPage() {
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="heading-lg mb-6">Not sure which companion to choose?</h2>
-          <p className="text-body mb-8">
-            Each companion is designed for different moments and needs. You can always switch between them, 
-            and they'll remember your conversations.
-          </p>
+            <p className="text-body mb-8">
+              Each companion is designed for different moments and needs. Try any companion with <strong>10 free conversations</strong> - no signup required!
+              Sign up for unlimited access and personalized support.
+            </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
             <div className="card">

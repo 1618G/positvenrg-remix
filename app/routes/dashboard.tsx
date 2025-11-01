@@ -2,6 +2,7 @@ import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { db } from "~/lib/db.server";
 import { verifyUserSession, getUserById } from "~/lib/auth.server";
+import { getUserSubscription } from "~/lib/subscription.server";
 import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
 
@@ -45,15 +46,89 @@ export async function loader({ request }: LoaderFunctionArgs) {
     take: 5,
   });
 
-  return json({ user, companions, recentChats });
+  // Get user subscription info
+  const subscription = await getUserSubscription(user.id);
+
+  // Get usage stats
+  const totalMessages = await db.message.count({
+    where: { userId: user.id },
+  });
+
+  const totalChats = await db.chat.count({
+    where: { userId: user.id },
+  });
+
+  // Get interaction limit info
+  const { checkInteractionLimit } = await import("~/lib/subscription.server");
+  const interactionCheck = await checkInteractionLimit(user.id);
+
+  return json({ 
+    user, 
+    companions, 
+    recentChats, 
+    subscription, 
+    stats: { totalMessages, totalChats },
+    interactions: {
+      used: subscription.interactionsUsed || 0,
+      allowed: subscription.interactionsAllowed,
+      remaining: interactionCheck.remaining,
+    }
+  });
 }
 
 export default function Dashboard() {
-  const { user, companions, recentChats } = useLoaderData<typeof loader>();
+  const { user, companions, recentChats, subscription, stats, interactions } = useLoaderData<typeof loader>();
   
   return (
     <div className="min-h-screen bg-sunrise-50">
       <Navigation />
+
+      {/* Subscription/Usage Info */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <div>
+                <div className="text-sm text-charcoal-600">Current Plan</div>
+                <div className="font-semibold text-charcoal-900 capitalize">{subscription.planType.toLowerCase().replace('_', ' ')}</div>
+              </div>
+              {subscription.planType === "PREMIUM" ? (
+                <div>
+                  <div className="text-sm text-charcoal-600">Interactions</div>
+                  <div className="font-semibold text-charcoal-900">Unlimited</div>
+                </div>
+              ) : interactions.allowed !== null ? (
+                <div>
+                  <div className="text-sm text-charcoal-600">Interactions This Month</div>
+                  <div className="font-semibold text-charcoal-900">
+                    {interactions.used} / {interactions.allowed.toLocaleString()}
+                  </div>
+                  {interactions.remaining !== null && interactions.remaining < 100 && (
+                    <div className="text-xs text-peach-600 mt-1">
+                      {interactions.remaining} remaining
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div className="text-sm text-charcoal-600">Status</div>
+                  <div className="font-semibold text-charcoal-900">Free Tier</div>
+                </div>
+              )}
+              <div>
+                <div className="text-sm text-charcoal-600">Total Messages</div>
+                <div className="font-semibold text-charcoal-900">{stats.totalMessages}</div>
+              </div>
+            </div>
+            {(subscription.planType === "FREE" || 
+              (interactions.allowed !== null && interactions.remaining !== null && interactions.remaining < 50)) && (
+              <Link to="/pricing" className="btn-primary text-sm">
+                {subscription.planType === "FREE" ? "Upgrade Plan" : "Upgrade for More"}
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Welcome Header */}
       <section className="py-12 bg-sunrise-gradient">
@@ -69,6 +144,9 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex gap-4">
+              <Link to="/profile" className="btn-secondary">
+                My Profile
+              </Link>
               <Link to="/companions" className="btn-secondary">
                 Browse All
               </Link>

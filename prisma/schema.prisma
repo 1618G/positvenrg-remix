@@ -11,64 +11,77 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  avatar    String?
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                      String    @id @default(cuid())
+  email                   String    @unique
+  password                String
+  name                    String?
+  avatar                  String?
+  role                    Role      @default(USER)
+  bio                     String? // User bio/profile description
+  location                String? // Optional location
+  onboardingCompleted     Boolean   @default(false) // Whether user completed onboarding
+  onboardingData          Json? // Stores onboarding questionnaire responses
+  emailVerified           Boolean   @default(false) // Email verification status
+  verificationToken       String?   @unique // Token for email verification
+  verificationTokenExpiry DateTime? // Token expiry time
+  magicLinkToken          String?   @unique // Token for magic link login
+  magicLinkTokenExpiry    DateTime? // Magic link token expiry
+  ageRange                String? // Age range (18-25, 26-35, 36-50, 50+)
+  interests               Json? // Array of interests/hobbies
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   // Relations
-  chats     Chat[]
-  messages  Message[]
-  companions Companion[]
-  preferences UserPreference[]
-  crisisLogs CrisisLog[]
+  chats             Chat[]
+  messages          Message[]
+  managedCompanions Companion[] // Companions created/managed by this user (admin)
+  preferences       UserPreference[]
+  crisisLogs        CrisisLog[]
+  subscription      Subscription?
+  usageLogs         UsageLog[]
 
   @@map("users")
 }
 
 model Companion {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  personality String?
-  avatar      String?
-  tagline     String?  // Short tagline for the companion
-  mood        String?  // Mood category (Cheerful, Calm, Motivational, etc.)
-  color       String?  // Primary color theme
-  isPremium   Boolean  @default(false) // Whether this is a premium companion
-  isActive    Boolean  @default(true)
-  systemPrompt String? // System prompt for AI training
-  trainingData Json?   // Additional training data and context
+  id               String   @id @default(cuid())
+  name             String   @unique
+  description      String?
+  personality      String?
+  avatar           String?
+  tagline          String? // Short tagline for the companion
+  mood             String? // Mood category (Cheerful, Calm, Motivational, etc.)
+  color            String? // Primary color theme
+  isPremium        Boolean  @default(false) // Whether this is a premium companion
+  isActive         Boolean  @default(true)
+  systemPrompt     String? // System prompt for AI training
+  trainingData     Json? // Additional training data and context
   knowledgeBaseUrl String? // URL to companion's knowledge base
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chats       Chat[]
-  knowledge   CompanionKnowledge[]
+  userId    String? // Optional - admin user who created/manages this companion
+  user      User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  chats     Chat[]
+  knowledge CompanionKnowledge[]
 
   @@map("companions")
 }
 
 model Chat {
-  id          String   @id @default(cuid())
-  title       String?
-  isActive    Boolean  @default(true)
+  id                  String   @id @default(cuid())
+  title               String?
+  isActive            Boolean  @default(true)
   conversationContext Json? // Store conversation context and summary
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // Relations
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   companionId String
-  companion   Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+  companion   Companion             @relation(fields: [companionId], references: [id], onDelete: Cascade)
   messages    Message[]
   summaries   ConversationSummary[]
   crisisLogs  CrisisLog[]
@@ -80,14 +93,14 @@ model Message {
   id        String      @id @default(cuid())
   content   String
   role      MessageRole
-  metadata  Json?       // Store sentiment, keywords, crisis flags
+  metadata  Json? // Store sentiment, keywords, crisis flags
   createdAt DateTime    @default(now())
 
   // Relations
-  userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chatId    String
-  chat      Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId     String
+  chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
   crisisLogs CrisisLog[]
 
   @@map("messages")
@@ -106,44 +119,44 @@ enum MessageRole {
 
 model UserPreference {
   id          String   @id @default(cuid())
-  preferences Json?    // User preferences, triggers, companion-specific notes
-  triggers    Json?    // Known triggers and sensitivities
-  goals       Json?    // User goals and objectives
+  preferences Json? // User preferences, triggers, companion-specific notes
+  triggers    Json? // Known triggers and sensitivities
+  goals       Json? // User goals and objectives
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_preferences")
 }
 
 model ConversationSummary {
-  id          String   @id @default(cuid())
-  summary     String   // AI-generated conversation summary
-  keyPoints   Json?    // Extracted key points, preferences, triggers
-  sentiment   String?  // Overall conversation sentiment
-  topics      Json?    // Main topics discussed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  summary   String // AI-generated conversation summary
+  keyPoints Json? // Extracted key points, preferences, triggers
+  sentiment String? // Overall conversation sentiment
+  topics    Json? // Main topics discussed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  chatId      String
-  chat        Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId String
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@map("conversation_summaries")
 }
 
 model CompanionKnowledge {
-  id          String   @id @default(cuid())
-  title       String   // Knowledge entry title
-  content     String   // Knowledge content
-  category    String   // Category (breathing, grief, productivity, etc.)
-  keywords    Json?    // Search keywords
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  title     String // Knowledge entry title
+  content   String // Knowledge content
+  category  String // Category (breathing, grief, productivity, etc.)
+  keywords  Json? // Search keywords
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   companionId String
@@ -153,23 +166,106 @@ model CompanionKnowledge {
 }
 
 model CrisisLog {
-  id          String   @id @default(cuid())
-  riskLevel   String   // low, medium, high, critical
-  keywords    Json?    // Detected crisis keywords
-  sentiment   String?  // Sentiment analysis result
-  resources   Json?    // Crisis resources provided
-  resolved    Boolean  @default(false)
-  notes       String?  // Admin notes
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  riskLevel String // low, medium, high, critical
+  keywords  Json? // Detected crisis keywords
+  sentiment String? // Sentiment analysis result
+  resources Json? // Crisis resources provided
+  resolved  Boolean  @default(false)
+  notes     String? // Admin notes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chatId      String?
-  chat        Chat?    @relation(fields: [chatId], references: [id], onDelete: SetNull)
-  messageId   String?
-  message     Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId    String?
+  chat      Chat?    @relation(fields: [chatId], references: [id], onDelete: SetNull)
+  messageId String?
+  message   Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
 
   @@map("crisis_logs")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planType             SubscriptionPlan   @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId     String?            @unique // Stripe customer ID
+  stripeSubscriptionId String?            @unique // Stripe subscription ID
+  stripePriceId        String? // Stripe price ID for the subscription
+  currentPeriodStart   DateTime? // Current billing period start
+  currentPeriodEnd     DateTime? // Current billing period end
+  cancelAtPeriodEnd    Boolean            @default(false) // Whether to cancel at period end
+  canceledAt           DateTime? // When subscription was canceled
+  tokensRemaining      Int                @default(0) // Tokens remaining for token-based plans
+  tokensPerMonth       Int? // Monthly token allowance
+  messagesAllowed      Int? // Monthly message limit for subscription plans
+  messagesUsed         Int                @default(0) // Messages used this period
+  interactionsAllowed  Int? // Number of interactions allowed per month (null = unlimited)
+  interactionsUsed     Int                @default(0) // Number of interactions used this period
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+enum SubscriptionPlan {
+  FREE // Free tier with limited messages/tokens
+  BASIC // Basic subscription - limited messages
+  PRO // Pro subscription - unlimited messages + premium companions
+  STARTER // £10/month - 1000 interactions
+  PROFESSIONAL // £20/month - 2500 interactions
+  PREMIUM // £50/month - unlimited interactions
+  TOKEN_PACK_100 // Token pack: 100 tokens
+  TOKEN_PACK_500 // Token pack: 500 tokens
+  TOKEN_PACK_1000 // Token pack: 1000 tokens
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  INCOMPLETE
+}
+
+model UsageLog {
+  id             String          @id @default(cuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId         String? // Chat where usage occurred
+  messageId      String? // Specific message
+  actionType     UsageActionType // Type of action
+  tokensUsed     Int             @default(0) // Tokens consumed for this action
+  modelUsed      String? // AI model used (e.g., "gemini-2.5-flash")
+  responseLength Int? // Length of AI response (characters)
+  cost           Float? // Estimated cost in USD
+  metadata       Json? // Additional metadata
+  createdAt      DateTime        @default(now())
+
+  @@index([userId, createdAt])
+  @@map("usage_logs")
+}
+
+enum UsageActionType {
+  CHAT_MESSAGE // Sending/receiving chat message
+  CONVERSATION_SUMMARY // Generating conversation summary
+  MEMORY_UPDATE // Updating conversation memory
+  KNOWLEDGE_SEARCH // Searching knowledge base
+}
+
+model GuestUsage {
+  id                String   @id @default(cuid())
+  ipAddress         String // IP address of guest user
+  conversationCount Int      @default(0) // Number of conversations used
+  lastUsedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([ipAddress])
+  @@index([ipAddress, lastUsedAt])
+  @@map("guest_usage")
 }

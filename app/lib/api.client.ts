@@ -220,24 +220,31 @@ class ApiClient {
     const startTime = Date.now();
     
     try {
-      const systemPrompt = companionPersonality 
-        ? `You are a positive energy AI companion. Your personality: ${companionPersonality}. Respond in a warm, supportive, and encouraging way. Keep responses concise but meaningful.`
-        : "You are a positive energy AI companion. Respond in a warm, supportive, and encouraging way. Keep responses concise but meaningful.";
+      console.log("🔌 API Client: Starting Gemini request...");
+      
+      // Use the provided system prompt as-is (it already contains full instructions)
+      const systemPrompt = companionPersonality || "You are a positive energy AI companion. Respond in a warm, supportive, and encouraging way. Keep responses concise but meaningful. Always respond directly to what the user is saying - don't ask generic questions.";
 
-      const messages = [
-        { role: "user", content: systemPrompt },
-        ...chatHistory,
-        { role: "user", content: message }
+      // Build conversation history in Gemini format (proper structure with turns)
+      const contents = [
+        {
+          role: "user",
+          parts: [{ text: systemPrompt }]
+        },
+        ...chatHistory.map(msg => ({
+          role: msg.role === "user" ? "user" : "model",
+          parts: [{ text: msg.content }]
+        })),
+        {
+          role: "user",
+          parts: [{ text: message }]
+        }
       ];
 
       const response = await this.external('gemini', `/models/${this.externalApis.gemini.model}:generateContent`, {
         method: 'POST',
         body: {
-          contents: [{
-            parts: [{
-              text: messages.map(msg => `${msg.role}: ${msg.content}`).join('\n\n')
-            }]
-          }],
+          contents: contents as any,
           generationConfig: {
             temperature: 0.7,
             topK: 40,
@@ -248,14 +255,18 @@ class ApiClient {
       });
 
       if (!response.success) {
+        console.error("❌ API Client: Gemini API returned error:", response.error);
         throw new Error(response.error || 'Failed to generate response');
       }
 
       const aiResponse = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (!aiResponse) {
+        console.error("❌ API Client: No response text in API response:", JSON.stringify(response.data, null, 2));
         throw new Error('No response generated from AI');
       }
+      
+      console.log("✅ API Client: Got response, length:", aiResponse.length);
 
       const duration = Date.now() - startTime;
       aiLogger.info({

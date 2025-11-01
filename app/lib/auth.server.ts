@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { db } from "./db.server";
 import { authLogger, securityLogger } from "./logger.server";
+import { createDefaultSubscription } from "./subscription.server";
 
 export interface User {
   id: string;
@@ -20,6 +21,9 @@ export async function createUser(email: string, password: string, name?: string)
       name,
     },
   });
+
+  // Create default free subscription for new user
+  await createDefaultSubscription(user.id);
 
   authLogger.userCreated(user.id, user.email, user.role);
   return user;
@@ -66,7 +70,7 @@ export function verifyUserSession(token: string): { userId: string } | null {
   }
 }
 
-export async function getUserById(id: string): Promise<User | null> {
+export async function getUserById(id: string): Promise<(User & { verificationToken?: string | null; verificationTokenExpiry?: Date | null }) | null> {
   const user = await db.user.findUnique({
     where: { id },
     select: {
@@ -74,6 +78,8 @@ export async function getUserById(id: string): Promise<User | null> {
       email: true,
       name: true,
       role: true,
+      verificationToken: true,
+      verificationTokenExpiry: true,
     },
   });
 

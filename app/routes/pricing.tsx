@@ -1,80 +1,106 @@
 import { Link } from "@remix-run/react";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { verifyUserSession, getUserById } from "~/lib/auth.server";
 import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  // Check if user is logged in
+  let user = null;
+  const cookieHeader = request.headers.get("Cookie");
+  const token = cookieHeader
+    ?.split(";")
+    .find(c => c.trim().startsWith("token="))
+    ?.split("=")[1];
+  
+  if (token) {
+    const { verifyUserSession, getUserById } = await import("~/lib/auth.server");
+    const session = verifyUserSession(token);
+    if (session) {
+      user = await getUserById(session.userId);
+    }
+  }
+
+  return json({ user });
+}
+
 const plans = [
   {
-    name: 'Starter',
-    price: '£9',
+    name: 'Free',
+    price: '£0',
     period: 'month',
-    description: 'Perfect for getting started with AI companionship',
+    description: 'Try our AI companions with limited access',
+    interactions: '10 conversations',
     features: [
-      '50 messages per day',
-      '1 concurrent session',
+      '10 free conversations',
       'Access to basic companions',
       'Basic safety features',
       'Email support'
     ],
-    cta: 'Start Free Trial',
-    popular: false,
-    color: 'sunrise'
-  },
-  {
-    name: 'Plus',
-    price: '£19',
-    period: 'month',
-    description: 'For regular users who want more interaction',
-    features: [
-      '200 messages per day',
-      '3 concurrent sessions',
-      'Access to all companions',
-      'Premium companions included',
-      'Advanced safety features',
-      'Priority support'
-    ],
-    cta: 'Start Free Trial',
-    popular: true,
-    color: 'peach'
-  },
-  {
-    name: 'Family',
-    price: '£39',
-    period: 'month',
-    description: 'Perfect for families sharing the experience',
-    features: [
-      '500 messages per day',
-      '5 concurrent sessions',
-      'Family sharing features',
-      'All premium companions',
-      'Advanced safety monitoring',
-      'Priority support',
-      'Family management tools'
-    ],
-    cta: 'Start Free Trial',
+    planType: null,
     popular: false,
     color: 'pastel'
   },
   {
-    name: 'Therapy',
-    price: '£79',
+    name: 'Starter',
+    price: '£10',
     period: 'month',
-    description: 'For those who need intensive support',
+    description: 'Perfect for regular use',
+    interactions: '1,000 interactions',
     features: [
-      '1000 messages per day',
-      '10 concurrent sessions',
-      'Custom personality companions',
-      'Advanced crisis detection',
-      '24/7 priority support',
-      'Personalized recommendations',
-      'Advanced analytics'
+      '1,000 interactions per month',
+      'Access to all basic companions',
+      'Message history saved',
+      'Email support',
+      'Personalized responses'
     ],
-    cta: 'Start Free Trial',
+    planType: 'STARTER',
+    popular: false,
+    color: 'sunrise'
+  },
+  {
+    name: 'Professional',
+    price: '£20',
+    period: 'month',
+    description: 'For power users and frequent conversations',
+    interactions: '2,500 interactions',
+    features: [
+      '2,500 interactions per month',
+      'Access to all companions',
+      'Priority support',
+      'Advanced personalization',
+      'Long-term memory',
+      'Conversation summaries'
+    ],
+    planType: 'PROFESSIONAL',
+    popular: true,
+    color: 'peach'
+  },
+  {
+    name: 'Premium',
+    price: '£50',
+    period: 'month',
+    description: 'Unlimited access for unlimited support',
+    interactions: 'Unlimited',
+    features: [
+      'Unlimited interactions',
+      'All premium companions',
+      '24/7 priority support',
+      'Advanced AI features',
+      'Custom companion training',
+      'Advanced analytics',
+      'API access (coming soon)'
+    ],
+    planType: 'PREMIUM',
     popular: false,
     color: 'warm'
   }
 ];
 
 export default function PricingPage() {
+  const { user } = useLoaderData<typeof loader>();
+
   return (
     <div className="min-h-screen bg-sunrise-50">
       <Navigation />
@@ -86,14 +112,10 @@ export default function PricingPage() {
             Choose Your Perfect Plan
           </h1>
           <p className="text-body max-w-3xl mx-auto mb-8">
-            Start with a free trial and discover which plan works best for you. 
-            No commitment, no pressure — just you and your new companion.
+            Start with free conversations or choose a subscription plan that fits your needs. 
+            All paid plans include a free trial period.
           </p>
           <div className="flex items-center justify-center space-x-4 text-sm text-charcoal-600">
-            <svg className="w-5 h-5 text-pastel-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span>7-day free trial on all plans</span>
             <svg className="w-5 h-5 text-pastel-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
@@ -102,6 +124,10 @@ export default function PricingPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <span>No setup fees</span>
+            <svg className="w-5 h-5 text-pastel-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Secure payments</span>
           </div>
         </div>
       </section>
@@ -110,13 +136,13 @@ export default function PricingPage() {
       <section className="py-16 bg-sunrise-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {plans.map((plan, index) => (
+            {plans.map((plan) => (
               <div 
                 key={plan.name}
-                className={`card relative ${plan.popular ? 'ring-2 ring-peach-200 shadow-warm' : ''}`}
+                className={`card relative ${plan.popular ? 'ring-2 ring-peach-200 shadow-warm scale-105' : ''}`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                     <span className="bg-peach-gradient text-charcoal-900 text-sm font-semibold px-4 py-2 rounded-full">
                       Most Popular
                     </span>
@@ -125,27 +151,51 @@ export default function PricingPage() {
                 
                 <div className="text-center mb-8">
                   <h3 className="heading-md mb-2">{plan.name}</h3>
-                  <div className="mb-4">
+                  <div className="mb-2">
                     <span className="text-4xl font-bold text-charcoal-900">{plan.price}</span>
-                    <span className="text-charcoal-600">/{plan.period}</span>
+                    {plan.price !== '£0' && (
+                      <span className="text-charcoal-600">/{plan.period}</span>
+                    )}
                   </div>
+                  <p className="text-sm font-semibold text-sunrise-600 mb-2">{plan.interactions}</p>
                   <p className="text-body text-charcoal-600">{plan.description}</p>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
                       <svg className="w-5 h-5 text-pastel-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-charcoal-700">{feature}</span>
+                      <span className="text-sm text-charcoal-700">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <button className={`w-full btn-primary`}>
-                  {plan.cta}
-                </button>
+                {plan.planType ? (
+                  user ? (
+                    <Link 
+                      to={`/checkout/${plan.planType.toLowerCase()}`}
+                      className={`w-full btn-primary block text-center`}
+                    >
+                      Subscribe Now
+                    </Link>
+                  ) : (
+                    <Link 
+                      to="/register"
+                      className={`w-full btn-primary block text-center`}
+                    >
+                      Get Started
+                    </Link>
+                  )
+                ) : (
+                  <Link 
+                    to="/companions"
+                    className={`w-full btn-secondary block text-center`}
+                  >
+                    Try Free
+                  </Link>
+                )}
               </div>
             ))}
           </div>
@@ -155,58 +205,51 @@ export default function PricingPage() {
       {/* Features Comparison */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="heading-lg text-center mb-12">Compare Features</h2>
+          <h2 className="heading-lg text-center mb-12">Compare Plans</h2>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b border-mist-200">
+                <tr className="border-b-2 border-charcoal-200">
                   <th className="text-left py-4 px-4 font-semibold text-charcoal-900">Features</th>
+                  <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Free</th>
                   <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Starter</th>
-                  <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Plus</th>
-                  <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Family</th>
-                  <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Therapy</th>
+                  <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Professional</th>
+                  <th className="text-center py-4 px-4 font-semibold text-charcoal-900">Premium</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-mist-200">
+              <tbody className="divide-y divide-charcoal-100">
                 <tr>
-                  <td className="py-4 px-4 font-medium text-charcoal-900">Daily Messages</td>
-                  <td className="py-4 px-4 text-center">50</td>
-                  <td className="py-4 px-4 text-center">200</td>
-                  <td className="py-4 px-4 text-center">500</td>
-                  <td className="py-4 px-4 text-center">1000</td>
+                  <td className="py-4 px-4 font-medium text-charcoal-900">Monthly Interactions</td>
+                  <td className="py-4 px-4 text-center text-charcoal-600">10</td>
+                  <td className="py-4 px-4 text-center text-charcoal-600">1,000</td>
+                  <td className="py-4 px-4 text-center text-charcoal-600">2,500</td>
+                  <td className="py-4 px-4 text-center text-charcoal-600 font-semibold">Unlimited</td>
                 </tr>
                 <tr>
-                  <td className="py-4 px-4 font-medium text-charcoal-900">Concurrent Sessions</td>
-                  <td className="py-4 px-4 text-center">1</td>
-                  <td className="py-4 px-4 text-center">3</td>
-                  <td className="py-4 px-4 text-center">5</td>
-                  <td className="py-4 px-4 text-center">10</td>
-                </tr>
-                <tr>
-                  <td className="py-4 px-4 font-medium text-charcoal-900">Premium Companions</td>
-                  <td className="py-4 px-4 text-center">❌</td>
+                  <td className="py-4 px-4 font-medium text-charcoal-900">AI Companions</td>
+                  <td className="py-4 px-4 text-center">✅</td>
                   <td className="py-4 px-4 text-center">✅</td>
                   <td className="py-4 px-4 text-center">✅</td>
                   <td className="py-4 px-4 text-center">✅</td>
                 </tr>
                 <tr>
-                  <td className="py-4 px-4 font-medium text-charcoal-900">Custom Personalities</td>
-                  <td className="py-4 px-4 text-center">❌</td>
-                  <td className="py-4 px-4 text-center">❌</td>
+                  <td className="py-4 px-4 font-medium text-charcoal-900">Message History</td>
                   <td className="py-4 px-4 text-center">❌</td>
                   <td className="py-4 px-4 text-center">✅</td>
-                </tr>
-                <tr>
-                  <td className="py-4 px-4 font-medium text-charcoal-900">Family Sharing</td>
-                  <td className="py-4 px-4 text-center">❌</td>
-                  <td className="py-4 px-4 text-center">❌</td>
                   <td className="py-4 px-4 text-center">✅</td>
                   <td className="py-4 px-4 text-center">✅</td>
                 </tr>
                 <tr>
-                  <td className="py-4 px-4 font-medium text-charcoal-900">Support Level</td>
+                  <td className="py-4 px-4 font-medium text-charcoal-900">Personalized Responses</td>
+                  <td className="py-4 px-4 text-center">Basic</td>
+                  <td className="py-4 px-4 text-center">✅</td>
+                  <td className="py-4 px-4 text-center">✅</td>
+                  <td className="py-4 px-4 text-center">✅</td>
+                </tr>
+                <tr>
+                  <td className="py-4 px-4 font-medium text-charcoal-900">Support</td>
                   <td className="py-4 px-4 text-center">Email</td>
-                  <td className="py-4 px-4 text-center">Priority</td>
+                  <td className="py-4 px-4 text-center">Email</td>
                   <td className="py-4 px-4 text-center">Priority</td>
                   <td className="py-4 px-4 text-center">24/7 Priority</td>
                 </tr>
@@ -222,34 +265,26 @@ export default function PricingPage() {
           <h2 className="heading-lg text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-6">
             <div className="card">
+              <h3 className="heading-md mb-3">What counts as an interaction?</h3>
+              <p className="text-body">
+                An interaction is one complete message exchange - when you send a message and receive a response from your AI companion. 
+                This includes both your message and the companion's response as one interaction.
+              </p>
+            </div>
+            
+            <div className="card">
               <h3 className="heading-md mb-3">Can I change my plan anytime?</h3>
               <p className="text-body">
-                Yes! You can upgrade or downgrade your plan at any time. Changes take effect 
-                immediately, and we'll prorate any billing differences.
+                Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, 
+                and we'll prorate any billing differences.
               </p>
             </div>
             
             <div className="card">
-              <h3 className="heading-md mb-3">What happens during the free trial?</h3>
+              <h3 className="heading-md mb-3">What if I run out of interactions?</h3>
               <p className="text-body">
-                You get full access to all features of your chosen plan for 7 days. 
-                No payment required upfront, and you can cancel anytime during the trial.
-              </p>
-            </div>
-            
-            <div className="card">
-              <h3 className="heading-md mb-3">Is there a family discount?</h3>
-              <p className="text-body">
-                The Family plan is designed for multiple users and includes family sharing 
-                features. It's already priced to provide great value for families.
-              </p>
-            </div>
-            
-            <div className="card">
-              <h3 className="heading-md mb-3">What if I need more messages?</h3>
-              <p className="text-body">
-                If you consistently need more than your plan allows, we recommend upgrading 
-                to a higher tier. You can also purchase additional message packs if needed.
+                You can upgrade to a higher tier at any time to get more interactions. 
+                Alternatively, you can wait until your monthly limit resets.
               </p>
             </div>
             
@@ -272,14 +307,20 @@ export default function PricingPage() {
           </h2>
           <p className="text-body mb-8 text-charcoal-700">
             Join thousands of people who have found comfort, support, and companionship 
-            with their AI friends. Start your free trial today.
+            with their AI friends. Start your free conversations today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/companions" className="btn-primary text-lg px-8 py-4">
-              Start Free Trial
-            </Link>
-            <Link href="/contact" className="btn-secondary text-lg px-8 py-4">
-              Have Questions?
+            {user ? (
+              <Link to="/dashboard" className="btn-primary text-lg px-8 py-4">
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link to="/register" className="btn-primary text-lg px-8 py-4">
+                Get Started Free
+              </Link>
+            )}
+            <Link to="/companions" className="btn-secondary text-lg px-8 py-4">
+              Browse Companions
             </Link>
           </div>
         </div>

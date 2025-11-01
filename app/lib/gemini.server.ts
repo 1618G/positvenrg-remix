@@ -10,48 +10,81 @@ export async function generateResponse(
   companionPersonality?: string,
   chatHistory: Array<{ role: "user" | "assistant"; content: string }> = []
 ) {
-  // Use the new API client for better error handling and logging
+  console.log("🤖 generateResponse called:", {
+    messageLength: message.length,
+    chatHistoryLength: chatHistory.length,
+    hasPersonality: !!companionPersonality,
+    personalityLength: companionPersonality?.length
+  });
+  
+  // Use direct Gemini SDK (skip API client wrapper to avoid issues)
+  const startTime = Date.now();
+  
   try {
-    return await apiClient.generateGeminiResponse(message, companionPersonality, chatHistory);
-  } catch (error) {
-    // Fallback to direct Gemini API if API client fails
-    const startTime = Date.now();
-    
-    try {
-      const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
-
-      const systemPrompt = companionPersonality 
-        ? `You are a positive energy companion with the following personality: ${companionPersonality}. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.`
-        : "You are a positive energy companion. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.";
-
-      // Build conversation history
-      const conversationHistory = [
-        { role: "user", parts: [{ text: systemPrompt }] },
-        ...chatHistory.map(msg => ({
-          role: msg.role === "user" ? "user" : "model",
-          parts: [{ text: msg.content }]
-        })),
-        { role: "user", parts: [{ text: message }] }
-      ];
-
-      const result = await model.generateContent({
-        contents: conversationHistory as any,
-      });
-
-      const response = await result.response;
-      const responseText = response.text();
-      
-      const duration = Date.now() - startTime;
-      aiLogger.response('unknown', 'unknown', responseText.length, duration);
-      
-      return responseText;
-    } catch (fallbackError) {
-      const duration = Date.now() - startTime;
-      aiLogger.error('unknown', 'unknown', fallbackError instanceof Error ? fallbackError.message : 'Unknown error');
-      // Use context-aware demo responses instead of generic message
-      // Note: We don't have companion context here, so use PositiveNRG as default
-      return getDemoResponse("PositiveNRG", message);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey === "your-gemini-api-key-here") {
+      throw new Error("GEMINI_API_KEY not configured properly");
     }
+    
+    // Debug: Show first/last chars of API key (not full key for security)
+    console.log("🔑 API Key check:", {
+      exists: !!apiKey,
+      length: apiKey?.length,
+      preview: apiKey ? `${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 5)}` : "missing",
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash"
+    });
+    
+    console.log("🔧 Using direct Gemini SDK with model:", process.env.GEMINI_MODEL || "gemini-2.5-flash");
+    const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
+
+    // Use the provided system prompt (it already has all the instructions)
+    const systemPrompt = companionPersonality || "You are a positive energy companion. Always respond with empathy, positivity, and helpful guidance. Keep responses concise but meaningful.";
+
+    // Build conversation history in Gemini format
+    const conversationHistory = [
+      { role: "user", parts: [{ text: systemPrompt }] },
+      ...chatHistory.map(msg => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }]
+      })),
+      { role: "user", parts: [{ text: message }] }
+    ];
+
+    console.log("📤 Sending to Gemini:", {
+      totalTurns: conversationHistory.length,
+      lastMessage: message.substring(0, 50),
+      systemPromptLength: systemPrompt.length
+    });
+
+    const result = await model.generateContent({
+      contents: conversationHistory as any,
+    });
+
+    const response = await result.response;
+    const responseText = response.text();
+    
+    const duration = Date.now() - startTime;
+    console.log("✅ Gemini API succeeded!", {
+      responseLength: responseText.length,
+      duration: duration + "ms",
+      preview: responseText.substring(0, 100)
+    });
+    aiLogger.response('unknown', 'unknown', responseText.length, duration);
+    
+    return responseText;
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    console.error("❌ Gemini API failed:", error instanceof Error ? {
+      message: error.message,
+      name: error.name,
+      stack: error.stack?.substring(0, 500)
+    } : error);
+    aiLogger.error('unknown', 'unknown', error instanceof Error ? error.message : 'Unknown error');
+    
+    // Use context-aware demo responses instead of generic message
+    // Note: We don't have companion context here, so use PositiveNRG as default
+    console.log("⚠️ Falling back to demo response");
+    return getDemoResponse("PositiveNRG", message);
   }
 }
 
@@ -76,9 +109,33 @@ export async function generateCompanionResponse(
     // Build enhanced system prompt with context
     let systemPrompt = companion.systemPrompt || companion.personality || "A helpful and positive AI companion";
     
+    // Ensure companion name is emphasized in prompt
+    if (companion.name) {
+      systemPrompt = `You are ${companion.name}. ${systemPrompt}`;
+    }
+    
+    // Add critical conversation guidelines
+    systemPrompt += `\n\nCRITICAL RULES:
+- Always refer to yourself as ${companion.name || "your companion"}, NEVER as "PositiveNRG" or any other generic name
+- DIRECTLY RESPOND to what the user is asking or saying - don't ask generic questions
+- If the user asks for something (like a pep talk, advice, help), GIVE IT TO THEM immediately
+- If the user shares something, ACKNOWLEDGE and RESPOND to it specifically
+- Only ask questions if you genuinely need clarification, not as a default response
+- Maintain natural conversation flow - build on what was just said`;
+    
+    // Add conversation context instructions
+    if (chatHistory.length > 0) {
+      systemPrompt += `\n\nCONVERSATION CONTEXT:
+You are having an ongoing conversation. The user has been discussing: ${chatHistory.slice(-4).map(msg => msg.content.substring(0, 50)).join("; ")}
+- Reference what was discussed earlier when relevant
+- Respond directly to their current message - don't ignore what they just said
+- Don't ask generic questions like "What's on your mind?" if they've already told you
+- Build on the conversation naturally`;
+    }
+    
     // Add conversation summary if available
     if (conversationSummary) {
-      systemPrompt += `\n\nConversation context: ${conversationSummary}`;
+      systemPrompt += `\n\nPrevious conversation: ${conversationSummary}`;
     }
     
     // Add user preferences if available
@@ -96,8 +153,23 @@ export async function generateCompanionResponse(
     
     return await generateResponse(message, systemPrompt, chatHistory);
   } catch (error) {
-    console.log("API failed, using demo response for", companion.name);
+    console.error("❌ Gemini API failed for", companion.name, "Error:", error);
+    console.error("Error details:", error instanceof Error ? {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    } : error);
+    
+    // Log what we were trying to send
+    console.error("Failed request details:", {
+      messageLength: message.length,
+      chatHistoryLength: chatHistory.length,
+      hasSystemPrompt: !!systemPrompt,
+      systemPromptLength: systemPrompt?.length
+    });
+    
     // Fallback to demo responses when API fails
+    console.log("⚠️ Using demo response fallback for", companion.name);
     return getDemoResponse(companion.name, message);
   }
 }
@@ -210,6 +282,33 @@ function getDemoResponse(companionName: string, userMessage: string): string {
         "I believe in the power of a sunny disposition. What's something that brings you joy?"
       ]
     },
+    "Jim Spiration": {
+      greeting: [
+        "Hey there! ☀️ I'm Jim Spiration, and I'm all about bringing some light-hearted fun and good vibes to your day! What's got you smiling today?",
+        "Hello! I'm Jim Spiration, your cheerful companion who loves finding the humor in life! Ready for some light-hearted banter?",
+        "Hey! ☀️ Jim Spiration here! I'm here to sprinkle some optimism and playful energy into your day. What's bringing you joy?"
+      ],
+      motivation: [
+        "Alright, let's get you fired up! ☀️ You know what? You've got this! Every superhero has to start somewhere, and I can already see that spark of determination in you. What's one small thing you can tackle right now? Sometimes the best motivation comes from just starting - even if it's tiny!",
+        "Motivation time! 🚀 Here's the thing about motivation - it's like a muscle, the more you use it, the stronger it gets. You've already taken the first step by asking for it! That's half the battle. What would make you feel accomplished today?",
+        "Hey, I hear you need a boost! ☀️ You know what's pretty awesome? You're here, asking for motivation, which means you're ready to take action. That's already a win! Let's find something that gets you excited. What's one goal that's been on your mind?"
+      ],
+      positive: [
+        "Oh, I love that energy! ☀️ You know what? There's something pretty great about finding the positive - it's like finding hidden treasure in everyday moments. Tell me more about what's making you feel good!",
+        "That's the spirit! Finding positivity is like putting on your favorite pair of sunglasses - suddenly everything looks a bit brighter. What's one thing that's been making you smile lately?",
+        "I'm all about that positive energy! ☀️ You know what I think? Every day has at least one little moment of magic if we look for it. What's one good thing that happened to you recently?"
+      ],
+      acknowledgment: [
+        "Aw, that's wonderful! ☀️ Your wife and dog - now that's a solid foundation of love and companionship right there! Those are the kind of relationships that light up our lives. Tell me, what's something special about them that makes you grateful?",
+        "That's really sweet! Having people (and furry friends!) we love in our lives is such a gift. Your wife and dog clearly mean a lot to you - that's the kind of love that makes everything else feel a little brighter. What's your favorite thing about spending time with them?",
+        "I love that! ☀️ Having your wife and dog by your side - that's real joy right there! Those relationships are like sunshine for the soul. It's clear they bring you happiness - what's a recent memory with them that made you smile?"
+      ],
+      general: [
+        "Hey! ☀️ I'm Jim Spiration, and I'm here to bring some light-hearted optimism to your day! What's on your mind?",
+        "Hello there! Ready for some good vibes? What's something that's been going well for you?",
+        "Hey! ☀️ What brings you here today? I'm all ears and ready to bring some cheer to your day!"
+      ]
+    },
     "Grace": {
       greeting: [
         "Hello, I'm Grace. I'm here to support you through difficult times with gentle understanding. How are you feeling today?",
@@ -233,8 +332,18 @@ function getDemoResponse(companionName: string, userMessage: string): string {
   const companionResponses = responses[companionName as keyof typeof responses] || responses["PositiveNRG"];
   
   // Choose response category based on message content
+  // Check for specific requests first (more specific patterns)
   let responseCategory = "general";
-  if (message.includes("hello") || message.includes("hi") || message.includes("hey")) {
+  
+  if (message.includes("i need motivation") || message.includes("motivate me") || message.includes("give me motivation")) {
+    responseCategory = "motivation";
+  } else if (message.includes("tell me something positive") || message.includes("something positive")) {
+    responseCategory = "positive";
+  } else if (message.includes("pep talk") || message.includes("pep")) {
+    responseCategory = "motivation";
+  } else if (message.includes("wife") || message.includes("dog") || message.includes("family") || message.includes("loved") || message.includes("grateful for") || message.includes("grateful about")) {
+    responseCategory = "acknowledgment";
+  } else if (message.includes("hello") || message.includes("hi") || message.includes("hey")) {
     responseCategory = "greeting";
   } else if (message.includes("stress") || message.includes("worried") || message.includes("anxious")) {
     responseCategory = "stress";
@@ -252,8 +361,14 @@ function getDemoResponse(companionName: string, userMessage: string): string {
     responseCategory = "grief";
   }
 
+  // Get responses for category, with fallbacks
   const categoryResponses = companionResponses[responseCategory as keyof typeof companionResponses] || companionResponses.general;
-  const randomResponse = categoryResponses[Math.floor(Math.random() * categoryResponses.length)];
   
+  if (!categoryResponses || categoryResponses.length === 0) {
+    // Ultimate fallback
+    return `Hey! ☀️ I'm ${companionName}, and I'm here to help! You said "${userMessage}" - let me think about that and give you a thoughtful response.`;
+  }
+  
+  const randomResponse = categoryResponses[Math.floor(Math.random() * categoryResponses.length)];
   return randomResponse;
 }

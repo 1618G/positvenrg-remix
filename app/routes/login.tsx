@@ -40,7 +40,14 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const token = createUserSession(user.id);
   
-  return redirect("/dashboard", {
+  // Check if onboarding is completed
+  const { isOnboardingCompleted } = await import("~/lib/onboarding.server");
+  const onboardingCompleted = await isOnboardingCompleted(user.id);
+  
+  // Redirect to onboarding if not completed, otherwise to dashboard
+  const redirectTo = onboardingCompleted ? "/dashboard" : "/onboarding";
+  
+  return redirect(redirectTo, {
     headers: {
       "Set-Cookie": `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`,
     },
@@ -144,6 +151,25 @@ export default function Login() {
                 )}
               </button>
             </Form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-charcoal-500">Or</span>
+              </div>
+            </div>
+
+            <Link
+              to="/magic-link"
+              className="btn-secondary w-full text-center"
+            >
+              <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+              Login with Magic Link
+            </Link>
 
             <div className="mt-8 text-center">
               <p className="text-body text-charcoal-600">
