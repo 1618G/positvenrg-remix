@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 const BASE_URL = process.env.BASE_URL || "http://localhost:8780";
 
 // Map subscription plan to Stripe price ID and interactions
-const PLAN_CONFIG: Record<string, { priceId: string; interactions: number | null; amount: number }> = {
+export const PLAN_CONFIG: Record<string, { priceId: string; interactions: number | null; amount: number }> = {
   STARTER: {
     priceId: process.env.STRIPE_PRICE_ID_STARTER || "",
     interactions: 1000,
@@ -289,5 +289,141 @@ export async function updateSubscriptionFromStripe(
 ): Promise<void> {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   await handleSubscriptionUpdated(subscription);
+}
+
+/**
+ * Get Stripe invoices for a customer
+ */
+export async function getStripeInvoices(customerId: string) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY not configured");
+  }
+
+  const invoices = await stripe.invoices.list({
+    customer: customerId,
+    limit: 100,
+  });
+
+  return invoices.data.map((invoice) => ({
+    id: invoice.id,
+    number: invoice.number,
+    amount: invoice.amount_paid,
+    currency: invoice.currency,
+    status: invoice.status,
+    created: new Date(invoice.created * 1000),
+    paidAt: invoice.status_transitions?.paid_at
+      ? new Date(invoice.status_transitions.paid_at * 1000)
+      : null,
+    periodStart: invoice.period_start
+      ? new Date(invoice.period_start * 1000)
+      : null,
+    periodEnd: invoice.period_end
+      ? new Date(invoice.period_end * 1000)
+      : null,
+    invoicePdf: invoice.invoice_pdf,
+    hostedInvoiceUrl: invoice.hosted_invoice_url,
+    description: invoice.description || invoice.lines.data[0]?.description || "Subscription",
+  }));
+}
+
+/**
+ * Get Stripe subscription details
+ */
+export async function getStripeSubscription(subscriptionId: string) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY not configured");
+  }
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  return subscription;
+}
+
+/**
+ * Cancel subscription (at period end or immediately)
+ */
+export async function cancelStripeSubscription(
+  subscriptionId: string,
+  cancelImmediately: boolean = false
+): Promise<void> {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY not configured");
+  }
+
+  if (cancelImmediately) {
+    await stripe.subscriptions.cancel(subscriptionId);
+  } else {
+    await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: true,
+    });
+  }
+}
+
+/**
+ * Reactivate canceled subscription
+ */
+export async function reactivateStripeSubscription(
+  subscriptionId: string
+): Promise<void> {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY not configured");
+  }
+
+  await stripe.subscriptions.update(subscriptionId, {
+    cancel_at_period_end: false,
+  });
+}
+
+/**
+ * Update subscription to a new plan (upgrade/downgrade)
+ */
+export async function changeSubscriptionPlan(
+  subscriptionId: string,
+  newPlanType: "STARTER" | "PROFESSIONAL" | "PREMIUM"
+): Promise<void> {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY not configured");
+  }
+
+  const planConfig = PLAN_CONFIG[newPlanType];
+  if (!planConfig) {
+    throw new Error(`Invalid plan type: ${newPlanType}`);
+  }
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const currentPriceId = subscription.items.data[0]?.price.id;
+
+  // Update subscription to new price
+  await stripe.subscriptions.update(subscriptionId, {
+    items: [
+      {
+        id: subscription.items.data[0]?.id,
+        price: planConfig.priceId,
+      },
+    ],
+    metadata: {
+      ...subscription.metadata,
+      planType: newPlanType,
+    },
+    proration_behavior: "always_invoice", // Charge prorated amount immediately
+  });
+}
+
+/**
+ * Get Stripe customer portal URL for self-service management
+ */
+export async function createCustomerPortalSession(
+  customerId: string,
+  returnUrl: string
+): Promise<string> {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY not configured");
+  }
+
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: returnUrl,
+  });
+
+  return session.url;
 }
 

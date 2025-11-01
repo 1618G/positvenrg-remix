@@ -120,12 +120,19 @@ export default function Dashboard() {
                 <div className="font-semibold text-charcoal-900">{stats.totalMessages}</div>
               </div>
             </div>
-            {(subscription.planType === "FREE" || 
-              (interactions.allowed !== null && interactions.remaining !== null && interactions.remaining < 50)) && (
-              <Link to="/pricing" className="btn-primary text-sm">
-                {subscription.planType === "FREE" ? "Upgrade Plan" : "Upgrade for More"}
-              </Link>
-            )}
+            <div className="flex gap-2">
+              {(subscription.planType === "FREE" || 
+                (interactions.allowed !== null && interactions.remaining !== null && interactions.remaining < 50)) && (
+                <Link to="/pricing" className="btn-primary text-sm">
+                  {subscription.planType === "FREE" ? "Upgrade Plan" : "Upgrade for More"}
+                </Link>
+              )}
+              {subscription.stripeCustomerId && (
+                <Link to="/subscription/manage" className="btn-secondary text-sm">
+                  Manage Subscription
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -144,6 +151,9 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex gap-4">
+              <Link to="/subscription/manage" className="btn-secondary">
+                Manage Subscription
+              </Link>
               <Link to="/profile" className="btn-secondary">
                 My Profile
               </Link>
