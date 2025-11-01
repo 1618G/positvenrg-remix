@@ -10,7 +10,7 @@ The exposed API key has been:
 
 ## 🔑 New API Key Details
 
-**New Secure API Key:** `AIzaSyCNSbxV3B_fyUoX7WqG5pfF5Ye4Rb7krmQ`
+**New Secure API Key:** Get from https://aistudio.google.com/apikey
 
 **Security Features:**
 - ✅ Restricted to Google Generative Language API only
@@ -27,12 +27,12 @@ The exposed API key has been:
 ### Step 2: Update API Key
 **Find this variable:**
 ```
-GEMINI_API_KEY=AIzaSyA1883Y6gFZrwLPpfAQdeHFtWvIo6y2svw
+GEMINI_API_KEY=YOUR_NEW_API_KEY_HERE
 ```
 
 **Replace with:**
 ```
-GEMINI_API_KEY=AIzaSyCNSbxV3B_fyUoX7WqG5pfF5Ye4Rb7krmQ
+GEMINI_API_KEY=YOUR_NEW_API_KEY_HERE
 ```
 
 ### Step 3: Save Changes
@@ -61,8 +61,8 @@ After updating Render:
 ## 🔒 Security Improvements Made
 
 ### ✅ **API Key Security:**
-- Old key: `AIzaSyA1883Y6gFZrwLPpfAQdeHFtWvIo6y2svw` (COMPROMISED - REGENERATED)
-- New key: `AIzaSyCNSbxV3B_fyUoX7WqG5pfF5Ye4Rb7krmQ` (SECURE - RESTRICTED)
+- Old key: (COMPROMISED - REGENERATED - Do not use)
+- New key: Get from https://aistudio.google.com/apikey (Add to .env file only)
 
 ### ✅ **Google Cloud Console:**
 - Created new API key with service restrictions
