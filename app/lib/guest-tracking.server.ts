@@ -1,9 +1,8 @@
 import { db } from "./db.server";
+import logger from "./logger.server";
+import { GUEST_CONFIG } from "./config.server";
 
-// Allow 1000 conversations for local testing, 10 for production
-// Check both NODE_ENV and if we're not in production
-const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
-const GUEST_CONVERSATION_LIMIT = isDevelopment ? 1000 : 10;
+const GUEST_CONVERSATION_LIMIT = GUEST_CONFIG.getLimit();
 
 /**
  * Get the client's IP address from the request
@@ -42,7 +41,7 @@ export async function canGuestUseConversation(ipAddress: string): Promise<boolea
     // Check if under limit
     return guestUsage.conversationCount < GUEST_CONVERSATION_LIMIT;
   } catch (error) {
-    console.error("Error checking guest usage:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', ipAddress }, 'Error checking guest usage');
     // On error, allow access (fail open)
     return true;
   }
@@ -63,7 +62,7 @@ export async function getGuestRemainingConversations(ipAddress: string): Promise
     
     return Math.max(0, GUEST_CONVERSATION_LIMIT - guestUsage.conversationCount);
   } catch (error) {
-    console.error("Error getting guest remaining:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', ipAddress }, 'Error getting guest remaining');
     return GUEST_CONVERSATION_LIMIT;
   }
 }
@@ -99,7 +98,7 @@ export async function incrementGuestConversationCount(ipAddress: string): Promis
       totalUsed: guestUsage.conversationCount,
     };
   } catch (error) {
-    console.error("Error incrementing guest usage:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', ipAddress }, 'Error incrementing guest usage');
     // Return optimistic values on error
     return {
       remaining: GUEST_CONVERSATION_LIMIT - 1,
@@ -117,7 +116,7 @@ export async function resetGuestUsage(ipAddress: string): Promise<void> {
       where: { ipAddress },
     });
   } catch (error) {
-    console.error("Error resetting guest usage:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', ipAddress }, 'Error resetting guest usage');
   }
 }
 

@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { db } from "./db.server";
 import crypto from "crypto";
+import logger from "./logger.server";
+import { EMAIL_CONFIG, APP_CONFIG } from "./config.server";
 
 // Gmail SMTP configuration
 const createTransporter = () => {
@@ -33,7 +35,8 @@ export function generateSecureToken(): string {
  * Generate a 6-digit verification code for dummy verification
  */
 export function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const { min, max } = EMAIL_CONFIG.verification.codeRange;
+  return Math.floor(min + Math.random() * (max - min + 1)).toString();
 }
 
 /**
@@ -45,7 +48,7 @@ export async function sendVerificationEmail(
   token: string
 ): Promise<void> {
   if (!transporter || !process.env.GMAIL_USER) {
-    console.warn("Gmail not configured (GMAIL_USER or GMAIL_APP_PASSWORD missing), skipping email send");
+    logger.warn({ email }, 'Gmail not configured (GMAIL_USER or GMAIL_APP_PASSWORD missing), skipping email send');
     return;
   }
 
@@ -86,7 +89,7 @@ export async function sendVerificationEmail(
               </p>
               
               <p style="font-size: 14px; color: #999; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-                This link will expire in 24 hours. If you didn't create an account, you can safely ignore this email.
+                This link will expire in ${EMAIL_CONFIG.verification.tokenExpiryHours} hours. If you didn't create an account, you can safely ignore this email.
               </p>
             </div>
             
@@ -97,9 +100,9 @@ export async function sendVerificationEmail(
         </html>
       `,
     });
-    console.log(`✅ Verification email sent to ${email}`);
+    logger.info({ email }, 'Verification email sent successfully');
   } catch (error) {
-    console.error("Failed to send verification email:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', email }, 'Failed to send verification email');
     throw error;
   }
 }
@@ -112,7 +115,7 @@ export async function sendMagicLink(
   token: string
 ): Promise<void> {
   if (!transporter || !process.env.GMAIL_USER) {
-    console.warn("Gmail not configured (GMAIL_USER or GMAIL_APP_PASSWORD missing), skipping email send");
+    logger.warn({ email }, 'Gmail not configured (GMAIL_USER or GMAIL_APP_PASSWORD missing), skipping email send');
     return;
   }
 
@@ -164,9 +167,9 @@ export async function sendMagicLink(
         </html>
       `,
     });
-    console.log(`✅ Magic link sent to ${email}`);
+    logger.info({ email }, 'Magic link sent successfully');
   } catch (error) {
-    console.error("Failed to send magic link:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', email }, 'Failed to send magic link');
     throw error;
   }
 }
@@ -242,7 +245,7 @@ export async function verifyMagicLinkToken(token: string): Promise<{
 export async function createVerificationToken(userId: string): Promise<string> {
   const token = generateSecureToken();
   const expiry = new Date();
-  expiry.setHours(expiry.getHours() + 24); // 24 hour expiry
+  expiry.setHours(expiry.getHours() + EMAIL_CONFIG.verification.tokenExpiryHours);
 
   await db.user.update({
     where: { id: userId },
@@ -261,7 +264,7 @@ export async function createVerificationToken(userId: string): Promise<string> {
 export async function createMagicLinkToken(userId: string): Promise<string> {
   const token = generateSecureToken();
   const expiry = new Date();
-  expiry.setMinutes(expiry.getMinutes() + 15); // 15 minute expiry
+  expiry.setHours(expiry.getHours() + EMAIL_CONFIG.magicLink.tokenExpiryHours);
 
   await db.user.update({
     where: { id: userId },

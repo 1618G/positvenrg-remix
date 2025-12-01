@@ -159,6 +159,52 @@ export const securityLogger = {
   },
 };
 
+// Safety & moderation logging
+export const safetyLogger = {
+  safetyCheck: (userId: string, riskLevel: string, flags: number, ip?: string) => {
+    logger.info({
+      event: 'safety_check',
+      userId,
+      riskLevel,
+      flags,
+      ip,
+    }, `Safety check for user ${userId}: ${riskLevel} risk with ${flags} flags`);
+  },
+
+  moderationFlag: (userId: string, flagType: string, severity: string, reason: string) => {
+    logger.warn({
+      event: 'moderation_flag',
+      userId,
+      flagType,
+      severity,
+      reason,
+    }, `Moderation flag for user ${userId}: ${flagType} (${severity}) - ${reason}`);
+  },
+
+  interventionRequired: (userId: string, riskLevel: string, reason: string) => {
+    logger.error({
+      event: 'safety_intervention',
+      userId,
+      riskLevel,
+      reason,
+    }, `Safety intervention required for user ${userId}: ${riskLevel} risk - ${reason}`);
+  },
+
+  warn: (message: string, data?: any) => {
+    logger.warn({
+      event: 'safety_warning',
+      ...data,
+    }, message);
+  },
+
+  error: (message: string, data?: any) => {
+    logger.error({
+      event: 'safety_error',
+      ...data,
+    }, message);
+  },
+};
+
 // Crisis detection logging
 export const crisisLogger = {
   crisisDetected: (userId: string, riskLevel: string, keywords: string[], ip?: string) => {
@@ -200,7 +246,7 @@ export const crisisLogger = {
 
 // Performance logging
 export const performanceLogger = {
-  slowQuery: (operation: string, duration: number, threshold: number = 1000) => {
+  slowQuery: (operation: string, duration: number, threshold: number = PERFORMANCE_CONFIG.slowQueryThreshold) => {
     if (duration > threshold) {
       logger.warn({
         event: 'performance_slow_query',

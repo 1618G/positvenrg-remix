@@ -7,12 +7,17 @@ import { generateEnhancedCompanionResponse } from "~/lib/conversation-handler.se
 import { getConversationHistory } from "~/lib/memory.server";
 import { checkInteractionLimit, consumeInteraction, estimateTokens, estimateCost } from "~/lib/subscription.server";
 import { getOnboardingData } from "~/lib/onboarding.server";
+import CVUpload from "~/components/CVUpload";
+import { LegalDisclaimer } from "~/components/LegalDisclaimer";
 import { 
   getClientIp, 
   canGuestUseConversation, 
   incrementGuestConversationCount, 
   getGuestRemainingConversations 
 } from "~/lib/guest-tracking.server";
+import { aiLogger } from "~/lib/logger.server";
+import logger from "~/lib/logger.server";
+import { MEMORY_CONFIG } from "~/lib/config.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   // Get companion first (always needed)
@@ -47,7 +52,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       include: {
         messages: {
           orderBy: { createdAt: "asc" },
-          take: 50,
+          take: MEMORY_CONFIG.messageHistory.maxRecentMessages,
         },
       },
     });
@@ -68,12 +73,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const onboardingData = await getOnboardingData(user.id);
+    
+    // Get user's CV if chatting with Jobe
+    let userCV = null;
+    if (companion.name === "Jobe") {
+      userCV = await db.userDocument.findFirst({
+        where: {
+          userId: user.id,
+          companionId: companion.id,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          originalName: true,
+          fileType: true,
+          createdAt: true,
+        },
+      });
+    }
 
     return json({ 
       user, 
       companion, 
       chat, 
       onboardingData,
+      userCV,
       isGuest: false,
       guestRemaining: null,
     });
@@ -209,7 +235,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         interactionsLimit: interactionCheck.limit,
       });
     } catch (error) {
-      console.error("Error generating response:", error);
+      aiLogger.error(companionId, userId || 'unknown', `Error generating response: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return json({ 
         error: "Failed to generate response. Please try again.",
         details: error instanceof Error ? error.message : "Unknown error"
@@ -244,10 +270,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             role: msg.role === "USER" ? "user" : "assistant" as "user" | "assistant",
             content: msg.content,
           }));
-        // Limit to last 10 messages for context
-        chatHistory = chatHistory.slice(-10);
+        // Limit to context window for context
+        chatHistory = chatHistory.slice(-MEMORY_CONFIG.messageHistory.contextWindow);
       } catch (e) {
-        console.error("Error parsing previous messages:", e);
+        logger.error({ error: e instanceof Error ? e.message : 'Unknown error', chatId }, 'Error parsing previous messages');
       }
     }
     
@@ -261,18 +287,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
       let conversationSummary: string | undefined;
       if (chatHistory.length > 0) {
         const recentTopics = chatHistory
-          .slice(-6)
+          .slice(-MEMORY_CONFIG.messageHistory.contextWindow)
           .map(msg => msg.content.substring(0, 50))
           .join("; ");
         conversationSummary = `Recent conversation topics: ${recentTopics}`;
       }
       
-      console.log("📨 Guest chat: Calling generateCompanionResponse", {
-        messageLength: message.length,
-        chatHistoryLength: chatHistory.length,
-        companionId: companion.id,
-        hasSummary: !!conversationSummary
-      });
+      // Guest chat: Calling generateCompanionResponse
       
       aiResponse = await generateCompanionResponse(
         message,
@@ -281,17 +302,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         conversationSummary
       );
       
-      console.log("✅ Guest chat: Got AI response", {
-        responseLength: aiResponse.length,
-        preview: aiResponse.substring(0, 100)
-      });
+      aiLogger.response(companion.id, 'guest', aiResponse.length, 0);
     } catch (aiError) {
-      console.error("❌ Guest chat: Error generating AI response:", aiError);
-      console.error("Error details:", aiError instanceof Error ? {
-        message: aiError.message,
-        stack: aiError.stack?.substring(0, 500),
-        name: aiError.name
-      } : aiError);
+      aiLogger.error(companion.id, 'guest', `Guest chat error generating AI response: ${aiError instanceof Error ? aiError.message : 'Unknown error'}`);
       // Fallback response if AI fails
       aiResponse = `I'm here to support you! I understand you said "${message}". How can I help you today?`;
     }
@@ -311,7 +324,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       requiresSignup: guestUsage.remaining === 0,
     });
   } catch (error) {
-    console.error("Error in guest chat action:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', companionId, ipAddress }, 'Error in guest chat action');
     return json({ 
       error: "Failed to process your message. Please try again.",
       details: error instanceof Error ? error.message : "Unknown error",
@@ -331,7 +344,7 @@ export default function Chat() {
   const [messageInput, setMessageInput] = useState("");
   const [guestMessages, setGuestMessages] = useState<Array<{role: string; content: string; id: string; timestamp: number}>>([]);
 
-  const { user, companion, chat, onboardingData, isGuest, guestRemaining, canUseGuest } = loaderData;
+  const { user, companion, chat, onboardingData, userCV, isGuest, guestRemaining, canUseGuest } = loaderData;
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -363,7 +376,7 @@ export default function Chat() {
         
         // Only skip if BOTH the user and AI messages already exist in recent messages
         if (userExists && aiExists) {
-          console.log("Skipping duplicate messages");
+          // Skipping duplicate messages
           return prev;
         }
         
@@ -383,7 +396,7 @@ export default function Chat() {
           },
         ];
         
-        console.log("Adding new messages:", { userMsg: userMsg.substring(0, 30), aiMsg: aiMsg.substring(0, 30) });
+        // Adding new messages to chat
         return [...prev, ...newPair];
       });
       
@@ -486,6 +499,11 @@ export default function Chat() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Disclaimer Banner */}
+      <div className="flex-shrink-0 px-6 py-2">
+        <LegalDisclaimer variant="banner" />
       </div>
 
       {/* Full Height Chat Area */}
@@ -657,6 +675,21 @@ export default function Chat() {
 
         {/* Fixed Input Area */}
         <div className="flex-shrink-0 bg-white border-t border-gray-200 p-6">
+          {/* CV Upload for Jobe */}
+          {user && companion.name === "Jobe" && (
+            <CVUpload
+              companionId={companion.id}
+              companionName={companion.name}
+              userId={user.id}
+              existingCV={userCV ? {
+                id: userCV.id,
+                originalName: userCV.originalName,
+                fileType: userCV.fileType,
+                createdAt: userCV.createdAt.toString(),
+              } : null}
+            />
+          )}
+          
           {/* Signup Prompt for Guests */}
           {requiresSignup && (
             <div className="mb-4 p-4 bg-gradient-to-r from-sunrise-500 to-pastel-500 rounded-xl text-white">
@@ -772,22 +805,43 @@ export default function Chat() {
             {/* Quick Actions */}
             {!requiresSignup && (
               <div className="flex flex-wrap gap-2">
-                {[
-                  "How are you feeling?",
-                  "I need motivation",
-                  "Help me relax",
-                  "Tell me something positive"
-                ].map((starter, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors duration-200"
-                    onClick={() => handleQuickAction(starter)}
-                    disabled={isSubmitting || requiresSignup || actionData?.requiresUpgrade}
-                  >
-                    {starter}
-                  </button>
-                ))}
+                {companion.name === "Jobe" ? (
+                  // Jobe-specific quick actions
+                  [
+                    "Find me jobs",
+                    "Where should I look?",
+                    "Review my CV",
+                    "Career advice"
+                  ].map((starter, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className="px-4 py-2 bg-electric-100 hover:bg-electric-200 text-electric-800 text-sm rounded-full transition-colors duration-200 font-medium"
+                      onClick={() => handleQuickAction(starter)}
+                      disabled={isSubmitting || requiresSignup || actionData?.requiresUpgrade}
+                    >
+                      {starter}
+                    </button>
+                  ))
+                ) : (
+                  // Other companions' quick actions
+                  [
+                    "How are you feeling?",
+                    "I need motivation",
+                    "Help me relax",
+                    "Tell me something positive"
+                  ].map((starter, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-full transition-colors duration-200"
+                      onClick={() => handleQuickAction(starter)}
+                      disabled={isSubmitting || requiresSignup || actionData?.requiresUpgrade}
+                    >
+                      {starter}
+                    </button>
+                  ))
+                )}
               </div>
             )}
           </Form>

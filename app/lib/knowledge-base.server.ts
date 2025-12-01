@@ -1,4 +1,7 @@
 import { db } from "./db.server";
+import logger from "./logger.server";
+import { handleDatabaseError, NotFoundError } from "./errors.server";
+import { validateOrThrow, companionIdSchema, entryIdSchema, knowledgeEntrySchema, knowledgeEntryUpdateSchema } from "./validation.server";
 
 export interface KnowledgeEntry {
   id: string;
@@ -22,7 +25,8 @@ export const KNOWLEDGE_CATEGORIES = {
   LUNA: ['sleep', 'insomnia', 'relaxation', 'bedtime', 'night_routine'],
   ECHO: ['listening', 'reflection', 'journaling', 'processing', 'validation'],
   POSITIVENRG: ['gratitude', 'positivity', 'energy', 'affirmations', 'optimism'],
-  SUNNY: ['humor', 'laughter', 'lighthearted', 'mood_boost', 'joy']
+  SUNNY: ['humor', 'laughter', 'lighthearted', 'mood_boost', 'joy'],
+  JOBE: ['resume', 'cv', 'interview', 'salary', 'skills', 'career_change', 'networking', 'workplace', 'relocation', 'visa', 'industry_specific']
 };
 
 export async function getCompanionKnowledge(companionId: string): Promise<KnowledgeEntry[]> {
@@ -46,7 +50,8 @@ export async function getCompanionKnowledge(companionId: string): Promise<Knowle
       isActive: entry.isActive
     }));
   } catch (error) {
-    console.error('Error fetching companion knowledge:', error);
+    const dbError = handleDatabaseError(error, 'getCompanionKnowledge', { companionId });
+    dbError.log();
     return [];
   }
 }
@@ -87,7 +92,8 @@ export async function searchKnowledge(
       isActive: entry.isActive
     }));
   } catch (error) {
-    console.error('Error searching knowledge:', error);
+    const dbError = handleDatabaseError(error, 'searchKnowledge', { companionId, query });
+    dbError.log();
     return [];
   }
 }
@@ -127,6 +133,43 @@ export async function getContextualKnowledge(
   
   if (lowerMessage.includes('laugh') || lowerMessage.includes('humor') || lowerMessage.includes('smile')) {
     relevantCategories.push('humor', 'laughter', 'mood_boost');
+  }
+  
+  // Jobe-specific career categories
+  if (lowerMessage.includes('resume') || lowerMessage.includes('cv') || lowerMessage.includes('curriculum')) {
+    relevantCategories.push('resume_cv');
+  }
+  
+  if (lowerMessage.includes('interview') || lowerMessage.includes('job interview')) {
+    relevantCategories.push('interview');
+  }
+  
+  if (lowerMessage.includes('salary') || lowerMessage.includes('negotiate') || lowerMessage.includes('compensation')) {
+    relevantCategories.push('salary');
+  }
+  
+  if (lowerMessage.includes('skill') || lowerMessage.includes('learn') || lowerMessage.includes('develop')) {
+    relevantCategories.push('skills');
+  }
+  
+  if (lowerMessage.includes('career change') || lowerMessage.includes('transition') || lowerMessage.includes('switch')) {
+    relevantCategories.push('career_transition');
+  }
+  
+  if (lowerMessage.includes('network') || lowerMessage.includes('linkedin') || lowerMessage.includes('connect')) {
+    relevantCategories.push('networking');
+  }
+  
+  if (lowerMessage.includes('workplace') || lowerMessage.includes('manager') || lowerMessage.includes('colleague')) {
+    relevantCategories.push('workplace');
+  }
+  
+  if (lowerMessage.includes('relocat') || lowerMessage.includes('move') || lowerMessage.includes('location')) {
+    relevantCategories.push('relocation');
+  }
+  
+  if (lowerMessage.includes('visa') || lowerMessage.includes('immigration') || lowerMessage.includes('sponsor')) {
+    relevantCategories.push('visa');
   }
   
   // If no specific categories found, return general knowledge
@@ -178,8 +221,9 @@ export async function addKnowledgeEntry(
       isActive: entry.isActive
     };
   } catch (error) {
-    console.error('Error adding knowledge entry:', error);
-    throw error;
+    const dbError = handleDatabaseError(error, 'addKnowledgeEntry', { companionId });
+    dbError.log();
+    throw dbError;
   }
 }
 
@@ -193,6 +237,8 @@ export async function updateKnowledgeEntry(
     isActive: boolean;
   }>
 ): Promise<KnowledgeEntry> {
+  validateOrThrow(entryIdSchema, entryId, "entryId");
+  validateOrThrow(knowledgeEntryUpdateSchema, updates);
   try {
     const entry = await db.companionKnowledge.update({
       where: { id: entryId },
@@ -208,8 +254,9 @@ export async function updateKnowledgeEntry(
       isActive: entry.isActive
     };
   } catch (error) {
-    console.error('Error updating knowledge entry:', error);
-    throw error;
+    const dbError = handleDatabaseError(error, 'updateKnowledgeEntry', { entryId });
+    dbError.log();
+    throw dbError;
   }
 }
 
@@ -219,8 +266,9 @@ export async function deleteKnowledgeEntry(entryId: string): Promise<void> {
       where: { id: entryId }
     });
   } catch (error) {
-    console.error('Error deleting knowledge entry:', error);
-    throw error;
+    const dbError = handleDatabaseError(error, 'deleteKnowledgeEntry', { entryId });
+    dbError.log();
+    throw dbError;
   }
 }
 
@@ -259,7 +307,7 @@ export async function getKnowledgeStats(): Promise<{
       }, {} as Record<string, number>)
     };
   } catch (error) {
-    console.error('Error getting knowledge stats:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Error getting knowledge stats');
     return {
       totalEntries: 0,
       entriesByCompanion: {},

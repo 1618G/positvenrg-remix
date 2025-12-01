@@ -1,7 +1,8 @@
 import { db } from "./db.server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { requireEnv } from "./env.server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(requireEnv("GEMINI_API_KEY"));
 
 export interface ConversationSummary {
   id: string;
@@ -82,7 +83,7 @@ Respond in JSON format:
       createdAt: summary.createdAt
     };
   } catch (error) {
-    console.error('Error generating conversation summary:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', chatId }, 'Error generating conversation summary');
     
     // Fallback to simple summary
     const fallbackSummary = `Conversation with ${messages.length} messages. Topics discussed: ${messages.map(m => m.content.substring(0, 50)).join(', ')}`;
@@ -171,7 +172,7 @@ export async function getConversationContext(
       } : undefined
     };
   } catch (error) {
-    console.error('Error getting conversation context:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', chatId }, 'Error getting conversation context');
     return {
       recentMessages: [],
       summary: undefined,
@@ -229,7 +230,7 @@ export async function updateUserPreferences(
       };
     }
   } catch (error) {
-    console.error('Error updating user preferences:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', userId }, 'Error updating user preferences');
     throw error;
   }
 }
@@ -252,7 +253,7 @@ export async function getConversationHistory(
       metadata: msg.metadata
     }));
   } catch (error) {
-    console.error('Error getting conversation history:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', chatId }, 'Error getting conversation history');
     return [];
   }
 }
@@ -275,7 +276,7 @@ export async function saveMessage(
       }
     });
   } catch (error) {
-    console.error('Error saving message:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', chatId, userId }, 'Error saving message');
     throw error;
   }
 }
@@ -292,19 +293,20 @@ export async function shouldGenerateSummary(
     });
     
     if (!existingSummary) {
-      return messageCount >= 5; // Generate first summary after 5 messages
+      return messageCount >= MEMORY_CONFIG.summaryGeneration.initialMessageCount;
     }
     
-    // Check if enough time has passed since last summary (24 hours)
+    // Check if enough time has passed since last summary
     const hoursSinceLastSummary = (Date.now() - existingSummary.createdAt.getTime()) / (1000 * 60 * 60);
-    return hoursSinceLastSummary >= 24 || messageCount >= 10;
+    return hoursSinceLastSummary >= MEMORY_CONFIG.summaryGeneration.timeThresholdHours || 
+           messageCount >= MEMORY_CONFIG.summaryGeneration.recurringMessageCount;
   } catch (error) {
-    console.error('Error checking if summary should be generated:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', chatId }, 'Error checking if summary should be generated');
     return false;
   }
 }
 
-export async function cleanupOldSummaries(olderThanDays: number = 30): Promise<void> {
+export async function cleanupOldSummaries(olderThanDays: number = MEMORY_CONFIG.cleanup.summaryRetentionDays): Promise<void> {
   try {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
@@ -317,7 +319,7 @@ export async function cleanupOldSummaries(olderThanDays: number = 30): Promise<v
       }
     });
   } catch (error) {
-    console.error('Error cleaning up old summaries:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Error cleaning up old summaries');
   }
 }
 
@@ -331,7 +333,7 @@ export async function getMemoryStats(): Promise<{
     const totalPreferences = await db.userPreference.count();
     
     const recentSummaries = await db.conversationSummary.findMany({
-      take: 10,
+      take: MEMORY_CONFIG.messageHistory.contextWindow,
       orderBy: { createdAt: 'desc' }
     });
     
@@ -348,7 +350,7 @@ export async function getMemoryStats(): Promise<{
       }))
     };
   } catch (error) {
-    console.error('Error getting memory stats:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Error getting memory stats');
     return {
       totalSummaries: 0,
       totalPreferences: 0,

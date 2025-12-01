@@ -5,6 +5,7 @@ import { verifyUserSession, getUserById } from "~/lib/auth.server";
 import { saveOnboardingData, isOnboardingCompleted } from "~/lib/onboarding.server";
 import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
+import type { OnboardingData } from "~/lib/types.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   // Verify authentication
@@ -57,25 +58,60 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   
   try {
+    // Safely parse JSON fields
+    const parseJsonField = (value: string | null, defaultValue: any = []) => {
+      if (!value) return defaultValue;
+      try {
+        return JSON.parse(value);
+      } catch {
+        return defaultValue;
+      }
+    };
+
     const onboardingData = {
       communicationStyle: formData.get("communicationStyle") as string,
       responseLength: formData.get("responseLength") as string,
       formality: formData.get("formality") as string,
-      primaryNeeds: JSON.parse(formData.get("primaryNeeds") as string || "[]"),
-      goals: formData.get("goals") as string,
-      triggers: JSON.parse(formData.get("triggers") as string || "[]"),
-      sensitivities: formData.get("sensitivities") as string || undefined,
-      preferredCompanions: JSON.parse(formData.get("preferredCompanions") as string || "[]"),
-      dailyRoutine: formData.get("dailyRoutine") as string || undefined,
-      challenges: formData.get("challenges") as string || undefined,
+      primaryNeeds: parseJsonField(formData.get("primaryNeeds") as string | null, []),
+      goals: (formData.get("goals") as string)?.trim() || "",
+      triggers: parseJsonField(formData.get("triggers") as string | null, []),
+      sensitivities: (formData.get("sensitivities") as string)?.trim() || undefined,
+      preferredCompanions: parseJsonField(formData.get("preferredCompanions") as string | null, []),
+      dailyRoutine: (formData.get("dailyRoutine") as string)?.trim() || undefined,
+      challenges: (formData.get("challenges") as string)?.trim() || undefined,
       sharePersonalInfo: formData.get("sharePersonalInfo") === "true",
-      reminderPreferences: formData.get("reminderPreferences") ? JSON.parse(formData.get("reminderPreferences") as string) : undefined,
+      reminderPreferences: formData.get("reminderPreferences") 
+        ? parseJsonField(formData.get("reminderPreferences") as string | null, undefined)
+        : undefined,
     };
 
-    await saveOnboardingData(session.userId, onboardingData as any);
+    // Validate required fields before processing
+    if (!onboardingData.communicationStyle || !onboardingData.responseLength || !onboardingData.formality) {
+      return json(
+        { error: "Please complete all required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (!onboardingData.primaryNeeds || onboardingData.primaryNeeds.length === 0) {
+      return json(
+        { error: "Please select at least one need" },
+        { status: 400 }
+      );
+    }
+
+    if (!onboardingData.goals || onboardingData.goals.trim().length < 10) {
+      return json(
+        { error: "Please describe your goals (at least 10 characters)" },
+        { status: 400 }
+      );
+    }
+
+    await saveOnboardingData(session.userId, onboardingData as OnboardingData);
     
     return redirect("/dashboard");
   } catch (error) {
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', userId: session.userId }, 'Onboarding save error');
     return json(
       { 
         error: error instanceof Error ? error.message : "Failed to save onboarding data. Please try again." 
@@ -232,9 +268,9 @@ export default function Onboarding() {
                       <label className="block text-sm font-medium text-charcoal-700 mb-2">
                         Response Length
                       </label>
-                      <select name="responseLength" className="input" required>
+                      <select name="responseLength" className="input" required defaultValue="moderate">
                         <option value="brief">Brief (Quick responses)</option>
-                        <option value="moderate" selected>Moderate (Balanced detail)</option>
+                        <option value="moderate">Moderate (Balanced detail)</option>
                         <option value="detailed">Detailed (Comprehensive responses)</option>
                       </select>
                     </div>
@@ -243,8 +279,8 @@ export default function Onboarding() {
                       <label className="block text-sm font-medium text-charcoal-700 mb-2">
                         Formality Level
                       </label>
-                      <select name="formality" className="input" required>
-                        <option value="casual" selected>Casual (Friendly and relaxed)</option>
+                      <select name="formality" className="input" required defaultValue="casual">
+                        <option value="casual">Casual (Friendly and relaxed)</option>
                         <option value="professional">Professional (Respectful and formal)</option>
                         <option value="friendly">Friendly (Warm but balanced)</option>
                       </select>
@@ -494,8 +530,29 @@ export default function Onboarding() {
                 ) : (
                   <button
                     type="submit"
-                    disabled={isSubmitting || (currentStep === 2 && selectedNeeds.length === 0)}
-                    className={`btn-primary ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={isSubmitting || selectedNeeds.length === 0}
+                    className={`btn-primary ${isSubmitting || selectedNeeds.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={(e) => {
+                      // Validate before submitting
+                      if (selectedNeeds.length === 0) {
+                        e.preventDefault();
+                        alert("Please select at least one need to continue");
+                        setCurrentStep(2);
+                        return false;
+                      }
+                      const form = document.getElementById("onboarding-form") as HTMLFormElement;
+                      if (!form) {
+                        e.preventDefault();
+                        return false;
+                      }
+                      const goalsInput = form.elements.namedItem("goals") as HTMLTextAreaElement;
+                      if (!goalsInput || !goalsInput.value || goalsInput.value.trim().length < 10) {
+                        e.preventDefault();
+                        alert("Please describe your goals (at least 10 characters)");
+                        setCurrentStep(3);
+                        return false;
+                      }
+                    }}
                   >
                     {isSubmitting ? (
                       <div className="flex items-center">

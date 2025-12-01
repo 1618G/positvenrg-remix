@@ -1,6 +1,7 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useActionData, useNavigation } from "@remix-run/react";
 import { db } from "~/lib/db.server";
+import type { SubscriptionPlan } from "~/lib/types.server";
 import { verifyUserSession, getUserById } from "~/lib/auth.server";
 import { getUserSubscription } from "~/lib/subscription.server";
 import {
@@ -46,14 +47,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     try {
       invoices = await getStripeInvoices(subscription.stripeCustomerId);
     } catch (error) {
-      console.error("Error fetching invoices:", error);
+      logger.error({ error: error instanceof Error ? error.message : 'Unknown error', userId: user.id }, 'Error fetching invoices');
     }
 
     if (subscription.stripeSubscriptionId) {
       try {
         stripeSubscription = await getStripeSubscription(subscription.stripeSubscriptionId);
       } catch (error) {
-        console.error("Error fetching Stripe subscription:", error);
+        logger.error({ error: error instanceof Error ? error.message : 'Unknown error', subscriptionId: subscription.stripeSubscriptionId }, 'Error fetching Stripe subscription');
       }
     }
   }
@@ -149,7 +150,7 @@ export async function action({ request }: ActionFunctionArgs) {
           return json({ error: "Invalid plan" }, { status: 400 });
         }
 
-        await changeSubscriptionPlan(subscription.stripeSubscriptionId, newPlan as any);
+        await changeSubscriptionPlan(subscription.stripeSubscriptionId, newPlan as SubscriptionPlan);
         
         // Update local subscription (webhook will also update this, but update immediately for better UX)
         const planConfig = PLAN_CONFIG[newPlan];
@@ -157,7 +158,7 @@ export async function action({ request }: ActionFunctionArgs) {
         await db.subscription.update({
           where: { userId: user.id },
           data: {
-            planType: newPlan as any,
+            planType: newPlan as SubscriptionPlan,
             interactionsAllowed: planConfig.interactions,
           },
         });
@@ -182,7 +183,7 @@ export async function action({ request }: ActionFunctionArgs) {
         return json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error: any) {
-    console.error("Subscription action error:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', userId: user.id }, 'Subscription action error');
     return json({ 
       error: error.message || "An error occurred. Please try again." 
     }, { status: 500 });

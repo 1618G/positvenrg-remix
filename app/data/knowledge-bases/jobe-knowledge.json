@@ -1,0 +1,201 @@
+{
+  "companion": "Jobe",
+  "knowledgeEntries": [
+    {
+      "title": "Resume Formatting Best Practices",
+      "content": "A well-formatted resume is crucial for making a strong first impression. Use a clean, professional layout with consistent formatting. Keep it to 1-2 pages maximum (1 page for entry-level, 2 pages for experienced professionals). Use a legible font (10-12pt), clear section headers, and plenty of white space. Save as PDF to preserve formatting. Ensure your contact information is prominently displayed at the top. Use bullet points for achievements and responsibilities, and maintain consistent date formatting throughout.",
+      "category": "resume_cv",
+      "keywords": ["resume", "formatting", "layout", "professional", "pdf", "structure"]
+    },
+    {
+      "title": "ATS (Applicant Tracking System) Optimization",
+      "content": "Many employers use ATS software to screen resumes. To pass ATS filters: use standard section headers (Experience, Education, Skills), include relevant keywords from the job description naturally, avoid graphics, images, or complex formatting, use standard fonts (Arial, Calibri, Times New Roman), save as a .docx or .pdf file, and spell out acronyms on first use. Match your resume language to the job posting - if they say 'project management,' don't abbreviate to 'PM.'",
+      "category": "resume_cv",
+      "keywords": ["ats", "applicant tracking", "keywords", "optimization", "screening", "filters"]
+    },
+    {
+      "title": "Quantifying Achievements on Your Resume",
+      "content": "Numbers make your achievements more impactful and credible. Instead of saying 'increased sales,' say 'increased sales by 25% over 6 months.' Use metrics for: revenue growth, cost savings, team size managed, percentage improvements, time reductions, project scope, customer satisfaction scores, and efficiency gains. Even if exact numbers aren't available, provide context like 'managed team of 5-8 members' or 'served 100+ clients.' Quantified achievements demonstrate concrete value to employers.",
+      "category": "resume_cv",
+      "keywords": ["achievements", "metrics", "quantification", "results", "numbers", "impact"]
+    },
+    {
+      "title": "Writing a Compelling Professional Summary",
+      "content": "Your professional summary (or objective) is your resume's opening statement - make it count. Keep it to 2-3 lines maximum. Start with your years of experience and key expertise. Include 2-3 of your most impressive achievements or skills. Tailor it to the specific job you're applying for. Use action verbs and industry-relevant keywords. For career changers, focus on transferable skills. Avoid generic phrases like 'hard-working' or 'team player' - be specific. This section should make the hiring manager want to read more.",
+      "category": "resume_cv",
+      "keywords": ["summary", "objective", "professional summary", "introduction", "opening"]
+    },
+    {
+      "title": "Industry-Specific Resume Variations",
+      "content": "Different industries have different resume expectations. Technology: Focus on technical skills, projects, and certifications. Include GitHub links for developers. Finance: Emphasize quantitative achievements, certifications (CFA, CPA), and compliance knowledge. Creative: Consider portfolio links, visual design skills, and creative projects. Academia: CV format preferred, extensive publication and presentation sections. Consulting: Problem-solving examples, client impact, and case studies. Healthcare: Licenses, certifications, and patient care metrics. Research your target industry's conventions before submitting.",
+      "category": "resume_cv",
+      "keywords": ["industry", "variations", "technology", "finance", "creative", "academic", "consulting"]
+    },
+    {
+      "title": "STAR Method for Behavioral Interviews",
+      "content": "The STAR method helps you structure answers to behavioral interview questions effectively. Situation: Describe the context and background. Task: Explain your specific responsibility or challenge. Action: Detail the specific steps you took. Result: Share the outcome and what you learned. Prepare 8-10 STAR stories covering: leadership, teamwork, problem-solving, conflict resolution, failure/learning, handling pressure, and achievement. Practice your stories out loud - aim for 2-3 minutes each. Make your actions specific and your results measurable when possible.",
+      "category": "interview",
+      "keywords": ["star method", "behavioral interview", "situation", "task", "action", "result"]
+    },
+    {
+      "title": "Common Interview Questions by Industry",
+      "content": "Prepare for industry-specific questions. Technology: System design, coding challenges, debugging approaches, technical trade-offs. Finance: Market analysis, risk assessment, regulatory knowledge, financial modeling. Sales: Handling objections, closing techniques, quota achievement, customer relationship management. Marketing: Campaign strategy, ROI measurement, brand positioning, digital marketing trends. Healthcare: Patient care scenarios, medical knowledge, ethical situations, continuing education. Engineering: Problem-solving processes, design principles, safety protocols, project management. Research common questions for your specific industry role.",
+      "category": "interview",
+      "keywords": ["industry", "questions", "technical", "finance", "sales", "marketing", "healthcare"]
+    },
+    {
+      "title": "Technical Interview Preparation",
+      "content": "Technical interviews require specific preparation strategies. Understand the format: coding challenge, system design, whiteboard session, or take-home assignment. Practice coding problems on platforms like LeetCode, HackerRank, or CodeSignal. Review fundamental concepts: data structures, algorithms, complexity analysis, design patterns. Prepare to explain your thinking process out loud - communication is often as important as the solution. Practice on a whiteboard or paper if applicable. Review your resume projects - you may be asked to explain or extend them. Ask clarifying questions before starting - it shows critical thinking.",
+      "category": "interview",
+      "keywords": ["technical interview", "coding", "algorithms", "programming", "whiteboard", "system design"]
+    },
+    {
+      "title": "Video Interview Best Practices",
+      "content": "Video interviews require unique preparation. Test your technology: camera, microphone, internet connection, and platform familiarity beforehand. Choose a professional background - neutral, well-lit, and uncluttered. Position your camera at eye level and look at it when speaking (not the screen). Dress professionally from head to toe - you never know if you'll need to stand. Minimize distractions: silence notifications, close unnecessary tabs, inform household members. Have your resume, notes, and questions visible but don't read from them. Maintain good posture and positive body language. Test audio/video 10 minutes before the call.",
+      "category": "interview",
+      "keywords": ["video interview", "remote", "zoom", "technology", "preparation", "virtual"]
+    },
+    {
+      "title": "Post-Interview Follow-Up",
+      "content": "Following up after an interview shows professionalism and interest. Send a thank-you email within 24 hours to each interviewer. Personalize each message - reference something specific from your conversation. Reiterate your interest and key qualifications. Address any concerns that came up during the interview. If they mentioned a timeline, you can follow up politely after that date. Keep it brief (3-4 sentences) and professional. Use proper grammar and spell-check. Connect on LinkedIn after the interview if appropriate. A thoughtful follow-up can make you stand out from other candidates.",
+      "category": "interview",
+      "keywords": ["follow-up", "thank you", "post-interview", "email", "professionalism"]
+    },
+    {
+      "title": "Salary Research Strategies",
+      "content": "Thorough salary research is essential before negotiations. Use multiple sources: Glassdoor, PayScale, LinkedIn Salary, industry-specific surveys, and government labor statistics. Research by: job title, location, company size, industry, and years of experience. Consider total compensation: base salary, bonuses, equity, benefits value, retirement contributions, and professional development budget. Network with people in similar roles - many will share salary ranges. Factor in cost of living differences if relocating. Understand that published ranges may be 15-20% wide - your specific qualifications and negotiation skills matter.",
+      "category": "salary",
+      "keywords": ["salary research", "compensation", "glassdoor", "payscale", "market rate"]
+    },
+    {
+      "title": "Salary Negotiation Framework",
+      "content": "Effective salary negotiation requires strategy and timing. Wait for them to make the first offer when possible. Express enthusiasm before negotiating - 'I'm very excited about this role, and I'd like to discuss the compensation package.' Anchor high but reasonably - research supports asking for 10-20% above their initial offer if it's below market. Focus on value, not need - explain how your skills justify the higher amount. Consider the full package - sometimes non-salary benefits have more value. Practice your negotiation script. Be ready to walk away if the offer is truly unacceptable. Most employers expect negotiation - it shows confidence and business acumen.",
+      "category": "salary",
+      "keywords": ["negotiation", "salary", "framework", "strategy", "offer", "compensation"]
+    },
+    {
+      "title": "Handling Counter-Offers",
+      "content": "Counter-offers require careful consideration. If your current employer counters, evaluate why they didn't offer this before you decided to leave. Research shows 80% of people who accept counter-offers leave within 18 months anyway. Consider: will the issues that made you look elsewhere be resolved? Will your relationship with management be damaged? What about trust? If you have multiple offers, leverage them professionally - 'I have another offer at X, but I'm most interested in this role because...' Be honest but diplomatic. Make decisions based on long-term career goals, not just salary.",
+      "category": "salary",
+      "keywords": ["counter-offer", "negotiation", "leverage", "multiple offers", "decision"]
+    },
+    {
+      "title": "Benefits Negotiation",
+      "content": "Benefits can be worth 30-40% of your total compensation. Negotiable benefits include: additional vacation days, flexible work arrangements, remote work options, professional development budget, conference attendance, stock options or equity, signing bonus, relocation assistance, health insurance upgrades, retirement contribution matching, and commuter benefits. If salary is firm, negotiate benefits. Calculate the monetary value - an extra week of vacation might be worth $X based on your daily rate. Some benefits cost the company little but mean a lot to you. Consider your priorities and life situation.",
+      "category": "salary",
+      "keywords": ["benefits", "negotiation", "vacation", "remote work", "equity", "bonus"]
+    },
+    {
+      "title": "Identifying Skill Gaps",
+      "content": "Recognizing skill gaps is the first step to career growth. Compare your current skills to job descriptions in your target roles. Seek feedback from managers, mentors, and peers. Use online assessments and skill quizzes. Review industry trends and emerging technologies. Analyze job postings for your dream role - what skills appear repeatedly? Consider both hard skills (technical abilities) and soft skills (communication, leadership). Prioritize gaps that: are frequently mentioned in target roles, align with your career goals, have clear learning paths, and won't become obsolete soon. Create a skill gap analysis document.",
+      "category": "skills",
+      "keywords": ["skill gaps", "assessment", "development", "learning", "competencies"]
+    },
+    {
+      "title": "Creating a Learning Roadmap",
+      "content": "A structured learning roadmap accelerates skill development. Start with clear goals: what role or skills are you targeting? Break down into milestones: beginner, intermediate, advanced levels. Mix learning formats: online courses, hands-on projects, reading, mentorship, and practical application. Set realistic timelines - most skills take 3-6 months to develop meaningfully. Build a portfolio or work samples to demonstrate progress. Join communities related to your learning goals. Get feedback regularly. Adjust your plan as you learn and industry needs evolve. Track your progress - celebrate small wins to maintain momentum.",
+      "category": "skills",
+      "keywords": ["learning roadmap", "skill development", "education", "training", "curriculum"]
+    },
+    {
+      "title": "Industry-Relevant Skills by Sector",
+      "content": "Different industries prioritize different skills. Technology: Programming languages, cloud platforms, DevOps, agile methodologies, cybersecurity. Finance: Financial modeling, data analysis, regulatory knowledge, risk management, certifications (CFA, FRM). Marketing: Digital marketing tools, analytics, content creation, SEO/SEM, social media strategy. Healthcare: Clinical skills, medical software, patient communication, regulatory compliance, continuing education. Engineering: CAD software, project management, safety protocols, technical documentation, quality assurance. Research emerging skills in your industry through job postings, industry reports, and professional associations.",
+      "category": "skills",
+      "keywords": ["industry", "skills", "technology", "finance", "marketing", "healthcare", "engineering"]
+    },
+    {
+      "title": "Career Change Strategies",
+      "content": "Successfully changing careers requires a strategic approach. Assess transferable skills - you have more than you think (communication, project management, problem-solving, leadership). Research your target industry extensively: informational interviews, industry events, online communities. Consider education or certifications if needed, but don't assume you need to start over completely. Build experience through: side projects, volunteering, freelancing, or part-time work in your target field. Update your narrative - reframe your experience to highlight relevant transferable skills. Network actively in your new industry. Be patient - career changes often take 12-24 months to fully transition.",
+      "category": "career_transition",
+      "keywords": ["career change", "transition", "transferable skills", "industry switch"]
+    },
+    {
+      "title": "Lateral vs Vertical Career Moves",
+      "content": "Understanding different career move types helps strategic planning. Vertical moves (promotions): Increase responsibility, authority, and usually compensation. Best for: clear advancement paths, building expertise in one area, maximizing compensation in your field. Lateral moves (role changes): Similar level, different function or company. Best for: skill diversification, exploring new areas, escaping toxic environments, building broader experience. Sometimes lateral moves lead to better vertical opportunities later. Consider: your long-term goals, learning opportunities, company culture, and overall career trajectory. Both types have value depending on your situation.",
+      "category": "career_transition",
+      "keywords": ["lateral move", "vertical move", "promotion", "career progression"]
+    },
+    {
+      "title": "LinkedIn Optimization for Networking",
+      "content": "LinkedIn is your professional networking hub - optimize it properly. Professional headshot (not a selfie, business attire, good lighting). Compelling headline - not just your job title, include value proposition. Complete profile - all sections filled with keywords. Regular activity - share industry insights, comment thoughtfully, post updates. Personalized connection requests - explain why you want to connect. Recommendations - request from colleagues and managers. Skills endorsements - build credibility. Custom URL - use your name. Summary section - tell your professional story. Join relevant groups. Engage authentically - don't just collect connections.",
+      "category": "networking",
+      "keywords": ["linkedin", "optimization", "profile", "networking", "professional", "social media"]
+    },
+    {
+      "title": "Informational Interviews",
+      "content": "Informational interviews are powerful networking and learning tools. Reach out politely: 'I'm exploring [field/role] and would love 15-20 minutes of your time for advice.' Prepare thoughtful questions: 'What does a typical day look like? What skills are most important? What challenges does the role face? What do you wish you knew earlier? How did you get into this field?' Respect their time - keep it to the promised duration. Send a thank-you note afterward. Stay in touch periodically - share interesting articles or updates. They're not job interviews, but relationships matter - treat them professionally. Many people enjoy sharing their expertise.",
+      "category": "networking",
+      "keywords": ["informational interview", "networking", "career advice", "mentorship"]
+    },
+    {
+      "title": "Workplace Dynamics: Managing Up",
+      "content": "Managing up means proactively working with your manager for mutual success. Understand their goals, pressures, and communication style. Anticipate needs - think ahead about what they'll need. Communicate proactively - regular updates prevent surprises. Align your work with their priorities. Provide solutions, not just problems - come with recommendations. Respect their time - schedule important discussions, not impromptu drop-ins. Build trust through consistency and reliability. Learn their preferences for communication, detail level, and decision-making style. A strong manager-employee relationship benefits both parties and your career.",
+      "category": "workplace",
+      "keywords": ["managing up", "manager relationship", "leadership", "communication", "workplace"]
+    },
+    {
+      "title": "Conflict Resolution in the Workplace",
+      "content": "Professional conflict resolution is a valuable career skill. Address issues early before they escalate. Focus on the issue, not the person - separate behavior from character. Use 'I' statements - 'I feel concerned when...' rather than 'You always...' Listen actively to understand their perspective. Find common ground and shared goals. Propose solutions collaboratively. Document important conversations if needed. Know when to escalate - some conflicts require HR or management involvement. Maintain professionalism even in difficult situations. Sometimes the solution is setting boundaries or changing your approach. Conflict is normal - how you handle it defines you professionally.",
+      "category": "workplace",
+      "keywords": ["conflict resolution", "workplace", "communication", "professionalism"]
+    },
+    {
+      "title": "Relocation Job Search Strategy",
+      "content": "Searching for jobs in a new location requires different tactics. Research the local job market - which industries dominate? What's the cost of living? Network with people already in that area - LinkedIn, alumni networks, industry groups. Consider temporary accommodations or extended visits to attend interviews and meet people. Update your resume with the target location or 'Relocating to [City] - available [Date].' Be transparent about relocation timeline and any flexibility. Research relocation assistance - many companies offer packages. Understand tax implications of moving. Consider remote work options as a bridge. Build local connections before you move if possible.",
+      "category": "relocation",
+      "keywords": ["relocation", "job search", "location", "moving", "geographic"]
+    },
+    {
+      "title": "Cost of Living Analysis for Relocation",
+      "content": "Relocation decisions must factor in cost of living differences. Use cost of living calculators: Numbeo, Bankrate, NerdWallet. Compare: housing (rent/mortgage), utilities, transportation, groceries, healthcare, taxes (state, local), and entertainment. Calculate your 'real' salary - $100K in San Francisco ≠ $100K in Des Moines. Consider quality of life factors: commute times, housing quality, amenities, family needs, and lifestyle preferences. Negotiate relocation assistance: moving costs, temporary housing, home sale assistance, cost of living adjustments. Create a detailed budget for your new location. Some cities offer much higher quality of life for the same salary.",
+      "category": "relocation",
+      "keywords": ["cost of living", "relocation", "salary", "budget", "comparison"]
+    },
+    {
+      "title": "Work Visa Types Overview",
+      "content": "Understanding work visa types helps navigate international job searches. Common types: H-1B (US skilled workers), Tier 2 (UK skilled workers), Temporary Skill Shortage (Australia), Work Permit (Canada), Blue Card (EU). Requirements vary: sponsorship needed, minimum salary thresholds, skill level requirements, language proficiency, health checks, and criminal background checks. Research country-specific requirements - each has different processes, timelines, and costs. Some countries have 'shortage occupation lists' making visas easier. Understand the difference between temporary and permanent residency paths. Start early - visa processes can take 3-12 months.",
+      "category": "visa",
+      "keywords": ["work visa", "immigration", "sponsorship", "international", "visa types"]
+    },
+    {
+      "title": "Visa Sponsorship Process",
+      "content": "Navigating visa sponsorship requires understanding the employer's perspective and process. Employers sponsor because: you have skills they can't find locally, you bring unique value, long-term relationship potential. The process typically: job offer with sponsorship commitment, employer files application, government processing (can take months), approval/rejection, visa issuance, travel arrangements. Employer considerations: costs ($5K-$15K+), time investment (3-12 months), legal requirements, and potential delays. Position yourself as worth the investment - emphasize unique skills, long-term commitment, and value proposition. Understand what employers look for in sponsored candidates.",
+      "category": "visa",
+      "keywords": ["sponsorship", "visa process", "employer", "application", "immigration"]
+    },
+    {
+      "title": "Country-Specific Visa Guidance",
+      "content": "Each country has unique visa requirements and processes. United States: H-1B lottery system, L-1 transfers, O-1 extraordinary ability, EB green card paths. United Kingdom: Skilled Worker Visa, shortage occupation list, points-based system, healthcare surcharge. Canada: Express Entry, Provincial Nominee Programs, work permits, permanent residency pathways. Australia: Temporary Skill Shortage visa, points-based system, state nomination programs. European Union: Blue Card for highly skilled, national work permits vary by country. Research official government websites for current requirements. Consider immigration lawyers for complex cases. Timelines and requirements change frequently.",
+      "category": "visa",
+      "keywords": ["country", "specific", "visa", "immigration", "usa", "uk", "canada", "australia", "eu"]
+    },
+    {
+      "title": "Performance Review Preparation",
+      "content": "Effective performance review preparation demonstrates professionalism. Document achievements throughout the year - don't wait until review time. Quantify your contributions: projects completed, goals met, improvements made. Prepare examples using the STAR method. Reflect on challenges overcome and lessons learned. Identify areas for growth and propose development plans. Research salary benchmarks if discussing compensation. Prepare questions about career development opportunities. Bring specific examples, not just general statements. Frame weaknesses as growth areas with plans to address them. Reviews are two-way conversations - engage actively.",
+      "category": "workplace",
+      "keywords": ["performance review", "evaluation", "career development", "feedback"]
+    },
+    {
+      "title": "Remote Work Considerations",
+      "content": "Remote work offers flexibility but requires discipline and planning. Set up a dedicated workspace - separate work from life. Establish routines: morning routine, work hours, breaks. Over-communicate with your team - they can't see you working. Use video calls for important discussions. Invest in reliable technology: internet, equipment, backup solutions. Manage your calendar proactively - block focus time. Stay visible: participate in virtual meetings, share updates, be responsive. Set boundaries - define work hours and stick to them. Consider time zones if working across regions. Remote work success requires self-discipline and strong communication skills.",
+      "category": "relocation",
+      "keywords": ["remote work", "work from home", "telecommuting", "flexible work"]
+    },
+    {
+      "title": "Building Professional Influence",
+      "content": "Building influence without authority accelerates career growth. Develop expertise in areas valuable to your organization. Share knowledge generously - help others succeed. Build relationships across departments - understand different perspectives. Speak up in meetings with valuable contributions. Volunteer for visible projects and initiatives. Deliver consistent results - reliability builds trust. Support your colleagues - people remember who helped them. Be a connector - introduce people who should know each other. Influence comes from being respected and helpful, not just from titles. Strong relationships amplify your impact.",
+      "category": "workplace",
+      "keywords": ["influence", "leadership", "professional development", "career growth"]
+    },
+    {
+      "title": "Networking at Industry Events",
+      "content": "Industry events are prime networking opportunities. Prepare before attending: research speakers and attendees, prepare elevator pitch, bring business cards, set goals (meet 3-5 new people). During events: arrive early, attend sessions actively (ask questions), use breaks strategically for networking, introduce yourself confidently, listen more than you talk, exchange contact information. Follow up within 48 hours: personalized LinkedIn requests, brief email referencing your conversation, share relevant articles or resources. Quality over quantity - meaningful connections matter more than collecting business cards. Follow through on any commitments you made.",
+      "category": "networking",
+      "keywords": ["industry events", "conferences", "networking", "professional development"]
+    }
+  ]
+}
+
+
+
+

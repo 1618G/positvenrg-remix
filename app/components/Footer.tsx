@@ -1,4 +1,5 @@
 import { Link } from "@remix-run/react";
+import { LegalDisclaimer } from "./LegalDisclaimer";
 
 export default function Footer() {
   return (
@@ -135,8 +136,13 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Legal Disclaimer */}
+        <div className="mt-8 pt-8 border-t border-nojever-800">
+          <LegalDisclaimer variant="footer" className="text-nojever-400" />
+        </div>
+
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-nojever-800 text-center text-nojever-500">
+        <div className="mt-4 pt-4 border-t border-nojever-800 text-center text-nojever-500">
           <p>&copy; 2024 Nojever. All rights reserved. Built with empathy and care.</p>
         </div>
       </div>

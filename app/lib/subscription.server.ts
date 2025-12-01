@@ -1,5 +1,8 @@
 import { db } from "./db.server";
+import type { SubscriptionMetadata } from "./types.server";
 import { SubscriptionPlan, SubscriptionStatus } from "@prisma/client";
+import { SUBSCRIPTION_CONFIG } from "./config.server";
+import { validateOrThrow, userIdSchema, subscriptionPlanSchema } from "./validation.server";
 
 export async function createDefaultSubscription(userId: string) {
   // Check if subscription already exists
@@ -42,6 +45,7 @@ export async function getUserSubscription(userId: string) {
 }
 
 export async function checkCanUseTokens(userId: string, tokensNeeded: number = 1): Promise<boolean> {
+  validateOrThrow(userIdSchema, userId, "userId");
   const subscription = await getUserSubscription(userId);
   
   // For subscription plans, check message limits
@@ -60,7 +64,7 @@ export async function checkCanUseTokens(userId: string, tokensNeeded: number = 1
           data: {
             messagesUsed: 0,
             currentPeriodStart: new Date(),
-            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+            currentPeriodEnd: new Date(Date.now() + SUBSCRIPTION_CONFIG.billingPeriodDays * 24 * 60 * 60 * 1000),
           },
         });
         return true;
@@ -125,7 +129,7 @@ export async function consumeTokens(
       userId,
       chatId: metadata?.chatId,
       messageId: metadata?.messageId,
-      actionType: (metadata?.actionType as any) || "CHAT_MESSAGE",
+      actionType: (metadata as SubscriptionMetadata)?.actionType || "CHAT_MESSAGE",
       tokensUsed,
       modelUsed: metadata?.modelUsed,
       responseLength: metadata?.responseLength,

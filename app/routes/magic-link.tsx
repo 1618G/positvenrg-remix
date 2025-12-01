@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
       message: "Magic link sent! Check your email for the login link.",
     });
   } catch (error) {
-    console.error("Failed to send magic link:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', email }, 'Failed to send magic link');
     return json(
       { error: "Failed to send magic link. Please try again." },
       { status: 500 }

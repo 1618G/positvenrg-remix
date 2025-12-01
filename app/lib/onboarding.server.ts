@@ -1,5 +1,6 @@
 import { db } from "./db.server";
 import { z } from "zod";
+import type { OnboardingData } from "./types.server";
 
 // Zod schema for onboarding data validation
 export const onboardingSchema = z.object({
@@ -29,6 +30,20 @@ export const onboardingSchema = z.object({
     enabled: z.boolean().default(false),
     frequency: z.enum(["daily", "weekly", "never"]).optional(),
   }).optional(),
+  
+  // Career Context (optional, for Jobe companion)
+  careerContext: z.object({
+    industry: z.string().optional(),
+    jobTitle: z.string().optional(),
+    experienceLevel: z.enum(["entry", "mid", "senior", "executive"]).optional(),
+    currentSituation: z.string().optional(),
+    careerGoals: z.string().optional(),
+    location: z.string().optional(),
+    targetLocations: z.array(z.string()).optional(),
+    relocationOpen: z.boolean().optional(),
+    visaConsiderations: z.boolean().optional(),
+    interests: z.array(z.string()).optional(),
+  }).optional(),
 });
 
 export type OnboardingData = z.infer<typeof onboardingSchema>;
@@ -46,7 +61,7 @@ export async function saveOnboardingData(
       where: { id: userId },
       data: {
         onboardingCompleted: true,
-        onboardingData: validatedData as any,
+        onboardingData: validatedData as OnboardingData,
       },
     });
     
@@ -94,6 +109,7 @@ export async function saveOnboardingData(
 }
 
 export async function getOnboardingData(userId: string): Promise<OnboardingData | null> {
+  validateOrThrow(userIdSchema, userId, "userId");
   const user = await db.user.findUnique({
     where: { id: userId },
     select: { onboardingData: true },

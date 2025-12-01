@@ -1,29 +1,35 @@
 import Stripe from "stripe";
 import { db } from "./db.server";
+import type { SubscriptionPlan, SubscriptionStatus } from "./types.server";
 import { Prisma } from "@prisma/client";
+import logger from "./logger.server";
+import { SUBSCRIPTION_CONFIG, APP_CONFIG } from "./config.server";
+import { handleExternalServiceError, handleDatabaseError, NotFoundError, ValidationError, ExternalServiceError } from "./errors.server";
+import { handleAppointmentPaymentWebhook } from "./appointment-payment.server";
+import { validateOrThrow, userIdSchema, subscriptionPlanSchema } from "./validation.server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-12-18.acacia",
 });
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:8780";
+const BASE_URL = APP_CONFIG.baseUrl;
 
 // Map subscription plan to Stripe price ID and interactions
 export const PLAN_CONFIG: Record<string, { priceId: string; interactions: number | null; amount: number }> = {
   STARTER: {
     priceId: process.env.STRIPE_PRICE_ID_STARTER || "",
-    interactions: 1000,
-    amount: 1000, // £10.00 in pence
+    interactions: SUBSCRIPTION_CONFIG.planInteractions.STARTER,
+    amount: SUBSCRIPTION_CONFIG.planAmounts.STARTER,
   },
   PROFESSIONAL: {
     priceId: process.env.STRIPE_PRICE_ID_PROFESSIONAL || "",
-    interactions: 2500,
-    amount: 2000, // £20.00 in pence
+    interactions: SUBSCRIPTION_CONFIG.planInteractions.PROFESSIONAL,
+    amount: SUBSCRIPTION_CONFIG.planAmounts.PROFESSIONAL,
   },
   PREMIUM: {
     priceId: process.env.STRIPE_PRICE_ID_PREMIUM || "",
-    interactions: null, // unlimited
-    amount: 5000, // £50.00 in pence
+    interactions: SUBSCRIPTION_CONFIG.planInteractions.PREMIUM,
+    amount: SUBSCRIPTION_CONFIG.planAmounts.PREMIUM,
   },
 };
 
@@ -34,18 +40,21 @@ export async function createCheckoutSession(
   userId: string,
   planType: "STARTER" | "PROFESSIONAL" | "PREMIUM"
 ): Promise<string> {
+  validateOrThrow(userIdSchema, userId, "userId");
+  validateOrThrow(subscriptionPlanSchema, planType, "planType");
+  
   if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY not configured");
+    throw new ExternalServiceError("STRIPE_SECRET_KEY not configured", "Stripe", undefined, { operation: "createCheckoutSession" });
   }
 
   const user = await db.user.findUnique({ where: { id: userId } });
   if (!user) {
-    throw new Error("User not found");
+    throw new NotFoundError("User", userId);
   }
 
   const planConfig = PLAN_CONFIG[planType];
   if (!planConfig) {
-    throw new Error(`Invalid plan type: ${planType}`);
+    throw new ValidationError(`Invalid plan type: ${planType}`, "planType", { planType });
   }
 
   // Get or create Stripe customer
@@ -140,8 +149,15 @@ export async function handleStripeWebhook(
       break;
     }
 
+    case "payment_intent.succeeded":
+    case "payment_intent.payment_failed": {
+      // Handle appointment payments
+      await handleAppointmentPaymentWebhook(event);
+      break;
+    }
+
     default:
-      console.log(`Unhandled event type: ${event.type}`);
+      logger.info({ eventType: event.type }, 'Unhandled Stripe event type');
   }
 }
 
@@ -153,7 +169,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const planType = session.metadata?.planType as string;
 
   if (!userId || !planType) {
-    console.error("Missing metadata in checkout session", session.id);
+    logger.error({ sessionId: session.id }, 'Missing metadata in checkout session');
     return;
   }
 
@@ -163,16 +179,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const planConfig = PLAN_CONFIG[planType as keyof typeof PLAN_CONFIG];
   if (!planConfig) {
-    console.error(`Invalid plan type: ${planType}`);
-    return;
+    logger.error({ planType }, 'Invalid plan type in checkout session');
+    return; // Don't throw, just log and return
   }
 
   // Update user subscription
   await db.subscription.update({
     where: { userId },
     data: {
-      planType: planType as any,
-      status: "ACTIVE" as any,
+      planType: planType as SubscriptionPlan,
+      status: "ACTIVE" as SubscriptionStatus,
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscription.id,
       stripePriceId: subscription.items.data[0]?.price.id || null,
@@ -191,7 +207,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const userId = subscription.metadata?.userId;
   if (!userId) {
-    console.error("Missing userId in subscription metadata", subscription.id);
+    logger.error({ subscriptionId: subscription.id }, 'Missing userId in subscription metadata');
     return;
   }
 
@@ -216,7 +232,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const userId = subscription.metadata?.userId;
   if (!userId) {
-    console.error("Missing userId in subscription metadata", subscription.id);
+    logger.error({ subscriptionId: subscription.id }, 'Missing userId in subscription metadata');
     return;
   }
 
@@ -224,8 +240,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   await db.subscription.update({
     where: { stripeSubscriptionId: subscription.id },
     data: {
-      planType: "FREE" as any,
-      status: "CANCELED" as any,
+      planType: "FREE" as SubscriptionPlan,
+      status: "CANCELED" as SubscriptionStatus,
       canceledAt: new Date(),
       stripeSubscriptionId: null,
       interactionsAllowed: null,
@@ -252,7 +268,7 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
       data: {
         interactionsUsed: 0,
         currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        currentPeriodEnd: new Date(Date.now() + SUBSCRIPTION_CONFIG.billingPeriodDays * 24 * 60 * 60 * 1000),
       },
     });
   }

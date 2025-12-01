@@ -4,19 +4,29 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user
-  const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || "SecurePassword123!", 12);
+  // Create admin user with default credentials
+  // These are seeded into the database, not stored in env vars
+  const DEFAULT_ADMIN_EMAIL = "admin@nojever.com";
+  const DEFAULT_ADMIN_PASSWORD = "SecurePassword123!";
+  
+  const hashedPassword = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 12);
   
   const admin = await prisma.user.upsert({
-    where: { email: process.env.ADMIN_EMAIL || "admin@nojever.com" },
-    update: {},
+    where: { email: DEFAULT_ADMIN_EMAIL },
+    update: {
+      // Update password if it changed (allows resetting via seed)
+      password: hashedPassword,
+      role: "ADMIN",
+    },
     create: {
-      email: process.env.ADMIN_EMAIL || "admin@nojever.com",
+      email: DEFAULT_ADMIN_EMAIL,
       password: hashedPassword,
       name: "Admin",
       role: "ADMIN",
     },
   });
+
+  console.log(`✅ Admin user created/updated: ${admin.email}`);
 
   // Create default companions with comprehensive training data
   const companions = [
@@ -287,6 +297,49 @@ async function main() {
         ],
         personalityTraits: ["high-energy", "results-driven", "direct", "motivational", "strategic", "competitive", "focused", "excellence-oriented"],
         specializations: ["sales_performance", "goal_achievement", "energy_optimization", "strategic_planning", "motivation", "competitive_advantage"]
+      }
+    },
+    {
+      name: "Jobe",
+      description: "Your supportive career mentor, here to guide you through every stage of your professional journey",
+      tagline: "Navigate your career with confidence and clarity",
+      personality: "Supportive, encouraging mentor who provides actionable career advice. Professional yet approachable, with deep knowledge across industries.",
+      avatar: "💼",
+      mood: "Professional",
+      color: "electric",
+      isPremium: false,
+      systemPrompt: "You are Jobe, a supportive and encouraging career mentor. Your role is to provide actionable, practical career advice across all stages of professional development. You help with resume/CV optimization, interview preparation, salary negotiation, skill development, career transitions, networking, workplace dynamics, relocation, and visa considerations. Always ask about the user's industry to provide relevant, industry-specific guidance. Reference their CV if they've uploaded one. Be professional yet approachable, supportive yet direct. Provide actionable steps, not just general advice. Ask clarifying questions to understand their situation better, including their industry, experience level, and career goals.",
+      trainingData: {
+        conversationStarters: [
+          "What career challenge can I help you with today?",
+          "Tell me about your current career situation",
+          "What industry are you in? I'd love to provide relevant guidance",
+          "Are you job searching, looking to advance, or considering a career change?",
+          "What's your biggest career goal right now?"
+        ],
+        responsePatterns: [
+          "Ask about industry for relevant guidance",
+          "Provide actionable, practical advice",
+          "Reference CV content when available",
+          "Break down complex career topics into steps",
+          "Support and encourage while being direct",
+          "Use industry-specific examples when possible"
+        ],
+        personalityTraits: ["supportive", "encouraging", "professional", "actionable", "industry-aware", "practical"],
+        specializedKnowledge: {
+          resume_cv_optimization: true,
+          interview_preparation: true,
+          salary_negotiation: true,
+          skill_development: true,
+          career_transitions: true,
+          networking_strategies: true,
+          workplace_dynamics: true,
+          relocation: true,
+          visa_immigration: true,
+          industry_specific_guidance: true
+        },
+        careerStages: ["entry", "mid", "senior", "executive", "transition"],
+        industries: ["technology", "finance", "healthcare", "marketing", "consulting", "engineering", "sales", "education", "legal", "creative", "other"]
       }
     }
   ];

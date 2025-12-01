@@ -1,21 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { aiLogger } from "./logger.server";
 import { apiClient } from "./api.client";
+import { requireEnv } from "./env.server";
+import type { TrainingData, GenerativeContent } from "./types.server";
 
 // Initialize Gemini AI (fallback for direct usage)
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(requireEnv("GEMINI_API_KEY"));
 
 export async function generateResponse(
   message: string,
   companionPersonality?: string,
   chatHistory: Array<{ role: "user" | "assistant"; content: string }> = []
 ) {
-  console.log("🤖 generateResponse called:", {
-    messageLength: message.length,
-    chatHistoryLength: chatHistory.length,
-    hasPersonality: !!companionPersonality,
-    personalityLength: companionPersonality?.length
-  });
+  aiLogger.request('unknown', 'unknown', message.length);
   
   // Use direct Gemini SDK (skip API client wrapper to avoid issues)
   const startTime = Date.now();
@@ -26,15 +23,7 @@ export async function generateResponse(
       throw new Error("GEMINI_API_KEY not configured properly");
     }
     
-    // Debug: Show first/last chars of API key (not full key for security)
-    console.log("🔑 API Key check:", {
-      exists: !!apiKey,
-      length: apiKey?.length,
-      preview: apiKey ? `${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 5)}` : "missing",
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash"
-    });
-    
-    console.log("🔧 Using direct Gemini SDK with model:", process.env.GEMINI_MODEL || "gemini-2.5-flash");
+    // API key validated
     const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
 
     // Use the provided system prompt (it already has all the instructions)
@@ -50,40 +39,24 @@ export async function generateResponse(
       { role: "user", parts: [{ text: message }] }
     ];
 
-    console.log("📤 Sending to Gemini:", {
-      totalTurns: conversationHistory.length,
-      lastMessage: message.substring(0, 50),
-      systemPromptLength: systemPrompt.length
-    });
+    // Sending to Gemini
 
     const result = await model.generateContent({
-      contents: conversationHistory as any,
+      contents: conversationHistory as GenerativeContent[],
     });
 
     const response = await result.response;
     const responseText = response.text();
     
     const duration = Date.now() - startTime;
-    console.log("✅ Gemini API succeeded!", {
-      responseLength: responseText.length,
-      duration: duration + "ms",
-      preview: responseText.substring(0, 100)
-    });
     aiLogger.response('unknown', 'unknown', responseText.length, duration);
     
     return responseText;
   } catch (error) {
-    const duration = Date.now() - startTime;
-    console.error("❌ Gemini API failed:", error instanceof Error ? {
-      message: error.message,
-      name: error.name,
-      stack: error.stack?.substring(0, 500)
-    } : error);
     aiLogger.error('unknown', 'unknown', error instanceof Error ? error.message : 'Unknown error');
     
     // Use context-aware demo responses instead of generic message
     // Note: We don't have companion context here, so use PositiveNRG as default
-    console.log("⚠️ Falling back to demo response");
     return getDemoResponse("PositiveNRG", message);
   }
 }
@@ -145,7 +118,7 @@ You are having an ongoing conversation. The user has been discussing: ${chatHist
     
     // Add specialized knowledge if available
     if (companion.trainingData) {
-      const trainingData = companion.trainingData as any;
+      const trainingData = companion.trainingData as TrainingData | null;
       if (trainingData.specializedKnowledge) {
         systemPrompt += `\n\nSpecialized knowledge available: ${JSON.stringify(trainingData.specializedKnowledge)}`;
       }
@@ -153,23 +126,10 @@ You are having an ongoing conversation. The user has been discussing: ${chatHist
     
     return await generateResponse(message, systemPrompt, chatHistory);
   } catch (error) {
-    console.error("❌ Gemini API failed for", companion.name, "Error:", error);
-    console.error("Error details:", error instanceof Error ? {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    } : error);
-    
-    // Log what we were trying to send
-    console.error("Failed request details:", {
-      messageLength: message.length,
-      chatHistoryLength: chatHistory.length,
-      hasSystemPrompt: !!systemPrompt,
-      systemPromptLength: systemPrompt?.length
-    });
+    aiLogger.error(companion.id, 'unknown', `Gemini API failed for ${companion.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     
     // Fallback to demo responses when API fails
-    console.log("⚠️ Using demo response fallback for", companion.name);
+    // Using demo response fallback
     return getDemoResponse(companion.name, message);
   }
 }

@@ -37,8 +37,15 @@ model User {
   managedCompanions Companion[] // Companions created/managed by this user (admin)
   preferences       UserPreference[]
   crisisLogs        CrisisLog[]
+  safetyLogs        SafetyLog[]
   subscription      Subscription?
   usageLogs         UsageLog[]
+  documents         UserDocument[]
+
+  // Human Companion Relations
+  companionProfile HumanCompanion?   @relation("CompanionProfile")
+  appointments     Appointment[]     @relation("UserAppointments")
+  reviews          CompanionReview[] @relation("UserReviews")
 
   @@map("users")
 }
@@ -65,6 +72,7 @@ model Companion {
   user      User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
   chats     Chat[]
   knowledge CompanionKnowledge[]
+  documents UserDocument[]
 
   @@map("companions")
 }
@@ -85,7 +93,9 @@ model Chat {
   messages    Message[]
   summaries   ConversationSummary[]
   crisisLogs  CrisisLog[]
+  safetyLogs  SafetyLog[]
 
+  @@index([userId, updatedAt])
   @@map("chats")
 }
 
@@ -102,7 +112,10 @@ model Message {
   chatId     String
   chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
   crisisLogs CrisisLog[]
+  safetyLogs SafetyLog[]
 
+  @@index([chatId, createdAt])
+  @@index([userId, createdAt])
   @@map("messages")
 }
 
@@ -165,6 +178,26 @@ model CompanionKnowledge {
   @@map("companion_knowledge")
 }
 
+model UserDocument {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename     String
+  originalName String
+  fileType     String // "pdf" or "doc" or "docx"
+  fileSize     Int // in bytes
+  filePath     String // storage path
+  companionId  String? // Optional: which companion this is for
+  companion    Companion? @relation(fields: [companionId], references: [id], onDelete: SetNull)
+  metadata     Json? // Extracted text, keywords, etc.
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([companionId, createdAt])
+  @@map("user_documents")
+}
+
 model CrisisLog {
   id        String   @id @default(cuid())
   riskLevel String // low, medium, high, critical
@@ -185,6 +218,30 @@ model CrisisLog {
   message   Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
 
   @@map("crisis_logs")
+}
+
+model SafetyLog {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId               String?
+  chat                 Chat?    @relation(fields: [chatId], references: [id], onDelete: SetNull)
+  messageId            String?
+  message              Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  riskLevel            String // low, medium, high, critical
+  moderationFlags      Json? // Moderation flags detected
+  crisisDetected       Boolean  @default(false)
+  requiresIntervention Boolean  @default(false)
+  messagePreview       String? // First 500 chars of message for context
+  resolved             Boolean  @default(false)
+  adminNotes           String? // Admin intervention notes
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([riskLevel, requiresIntervention])
+  @@index([createdAt, riskLevel])
+  @@map("safety_logs")
 }
 
 model Subscription {
@@ -268,4 +325,211 @@ model GuestUsage {
   @@unique([ipAddress])
   @@index([ipAddress, lastUsedAt])
   @@map("guest_usage")
+}
+
+// ============================================
+// Human Companion & Appointment Models
+// ============================================
+
+model HumanCompanion {
+  id     String @id @default(cuid())
+  userId String @unique // Links to User who is the companion
+  user   User   @relation("CompanionProfile", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Profile Information
+  displayName String // Public display name
+  bio         String? // Companion bio/description
+  avatar      String? // Profile picture URL
+  tags        Json? // Array of tags (e.g., ["listening", "motivational", "funny"])
+  specialties Json? // Areas of expertise/interests
+  languages   Json? // Languages spoken (e.g., ["English", "Spanish"])
+  timezone    String // Timezone (e.g., "America/New_York")
+
+  // Availability
+  availabilitySchedule Json? // Weekly schedule (e.g., { "monday": ["09:00-17:00"], ... })
+  isAvailable          Boolean @default(true) // Quick availability toggle
+
+  // Pricing
+  pricePerHour    Float // Price in cents (e.g., 5000 = $50.00)
+  currency        String @default("GBP") // Currency code
+  minimumDuration Int    @default(30) // Minimum booking in minutes
+
+  // Google Calendar Integration
+  googleCalendarId    String?   @unique // Google Calendar ID
+  googleAccessToken   String? // Encrypted OAuth access token
+  googleRefreshToken  String? // Encrypted OAuth refresh token
+  googleTokenExpiry   DateTime? // Token expiry
+  calendarSyncEnabled Boolean   @default(false) // Whether to sync with Google Calendar
+
+  // Status
+  isActive      Boolean @default(true) // Companion is active/available
+  isVerified    Boolean @default(false) // Admin verification status
+  rating        Float? // Average rating (1-5)
+  totalBookings Int     @default(0) // Total completed bookings
+  totalEarnings Float   @default(0) // Total earnings in cents
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  appointments Appointment[]
+  reviews      CompanionReview[]
+  earnings     CompanionEarning[]
+
+  @@index([isActive, isVerified])
+  @@index([userId])
+  @@map("human_companions")
+}
+
+model Appointment {
+  id String @id @default(cuid())
+
+  // Participants
+  userId      String // User booking the appointment
+  user        User           @relation("UserAppointments", fields: [userId], references: [id], onDelete: Cascade)
+  companionId String // Human companion
+  companion   HumanCompanion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+
+  // Scheduling
+  startTime DateTime // Appointment start time
+  endTime   DateTime // Appointment end time
+  duration  Int // Duration in minutes
+  timezone  String // Timezone of appointment
+
+  // Google Calendar
+  googleEventId    String? @unique // Google Calendar event ID
+  googleCalendarId String? // Which calendar the event is on
+
+  // Status
+  status AppointmentStatus @default(PENDING)
+  // PENDING = Booked, awaiting payment/confirmation
+  // CONFIRMED = Payment received, confirmed
+  // COMPLETED = Appointment finished
+  // CANCELLED = Cancelled by user or companion
+  // NO_SHOW = User didn't show up
+
+  // Payment
+  amount          Float // Amount in cents
+  currency        String        @default("GBP")
+  stripePaymentId String?       @unique // Stripe payment intent ID
+  paymentStatus   PaymentStatus @default(PENDING)
+  // PENDING = Payment not yet processed
+  // PAID = Payment successful
+  // REFUNDED = Payment refunded
+  // FAILED = Payment failed
+
+  // Meeting Details
+  meetingType MeetingType @default(VIDEO_CALL)
+  // VIDEO_CALL = Video call (Zoom, Google Meet, etc.)
+  // PHONE_CALL = Phone call
+  // TEXT_CHAT = Text-based chat
+  // IN_PERSON = In-person meeting (future)
+
+  meetingLink String? // Video call link (Zoom, Google Meet, etc.)
+  notes       String? // User notes/requests for companion
+
+  // Cancellation
+  cancelledAt        DateTime?
+  cancelledBy        String? // "user" or "companion"
+  cancellationReason String?
+  refundAmount       Float? // Refund amount if cancelled
+
+  // Completion
+  completedAt    DateTime?
+  userRating     Int? // User's rating (1-5)
+  userReview     String? // User's review text
+  companionNotes String? // Private notes from companion
+
+  // Relations
+  review  CompanionReview?
+  earning CompanionEarning?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, startTime])
+  @@index([companionId, startTime])
+  @@index([status, startTime])
+  @@index([googleEventId])
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum MeetingType {
+  VIDEO_CALL
+  PHONE_CALL
+  TEXT_CHAT
+  IN_PERSON
+}
+
+model CompanionReview {
+  id            String         @id @default(cuid())
+  appointmentId String         @unique
+  appointment   Appointment    @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  companionId   String
+  companion     HumanCompanion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+  userId        String // User who wrote the review
+  user          User           @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+
+  rating     Int // 1-5 stars
+  reviewText String? // Review text
+  isPublic   Boolean @default(true) // Whether review is public
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companionId, createdAt])
+  @@index([userId])
+  @@map("companion_reviews")
+}
+
+model CompanionEarning {
+  id            String         @id @default(cuid())
+  companionId   String
+  companion     HumanCompanion @relation(fields: [companionId], references: [id], onDelete: Cascade)
+  appointmentId String?        @unique // Optional link to appointment
+  appointment   Appointment?   @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  amount      Float // Earnings in cents
+  currency    String @default("GBP")
+  platformFee Float // Platform fee in cents (e.g., 20% = 2000 for £10)
+  netAmount   Float // Net earnings after platform fee
+
+  stripeTransferId String? // Stripe transfer ID
+  status           EarningStatus @default(PENDING)
+  // PENDING = Earnings pending transfer
+  // PROCESSING = Transfer in progress
+  // COMPLETED = Transfer completed
+  // FAILED = Transfer failed
+
+  paidAt    DateTime? // When payment was processed
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([companionId, createdAt])
+  @@index([status])
+  @@map("companion_earnings")
+}
+
+enum EarningStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

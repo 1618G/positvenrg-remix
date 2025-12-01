@@ -1,6 +1,8 @@
 import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { verifyUserSession, getUserById } from "~/lib/auth.server";
 import { createCheckoutSession } from "~/lib/stripe.server";
+import type { SubscriptionPlan } from "~/lib/types.server";
+import logger from "~/lib/logger.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   // Verify authentication
@@ -30,10 +32,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   try {
-    const checkoutUrl = await createCheckoutSession(session.userId, planType as any);
+    const checkoutUrl = await createCheckoutSession(session.userId, planType as SubscriptionPlan);
     return redirect(checkoutUrl);
   } catch (error) {
-    console.error("Failed to create checkout session:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', userId: session.userId, planType }, 'Failed to create checkout session');
     return redirect("/pricing?error=checkout-failed");
   }
 }

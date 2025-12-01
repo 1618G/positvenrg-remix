@@ -3,6 +3,7 @@ import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
 import { verifyLogin, createUserSession } from "~/lib/auth.server";
 import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
+import { LegalDisclaimer } from "~/components/LegalDisclaimer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   // Check if user is already logged in
@@ -40,14 +41,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const token = createUserSession(user.id);
   
-  // Check if onboarding is completed
-  const { isOnboardingCompleted } = await import("~/lib/onboarding.server");
-  const onboardingCompleted = await isOnboardingCompleted(user.id);
-  
-  // Redirect to onboarding if not completed, otherwise to dashboard
-  const redirectTo = onboardingCompleted ? "/dashboard" : "/onboarding";
-  
-  return redirect(redirectTo, {
+  // Onboarding is now part of registration, so always redirect to dashboard
+  return redirect("/dashboard", {
     headers: {
       "Set-Cookie": `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`,
     },
@@ -74,6 +69,13 @@ export default function Login() {
           </p>
         </div>
       </section>
+
+      {/* Disclaimer Banner */}
+      <div className="bg-white border-b border-yellow-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <LegalDisclaimer variant="inline" />
+        </div>
+      </div>
 
       {/* Login Form */}
       <section className="py-16 bg-white">

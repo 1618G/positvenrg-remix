@@ -4,6 +4,7 @@ import { useState } from "react";
 import { db } from "~/lib/db.server";
 import Navigation from "~/components/Navigation";
 import Footer from "~/components/Footer";
+import { LegalDisclaimer } from "~/components/LegalDisclaimer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const companions = await db.companion.findMany({
@@ -43,6 +44,13 @@ export default function CompanionsPage() {
   return (
     <div className="min-h-screen bg-sunrise-50">
       <Navigation />
+
+      {/* Disclaimer Banner */}
+      <div className="bg-white border-b border-yellow-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <LegalDisclaimer variant="inline" />
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="py-20 bg-white">

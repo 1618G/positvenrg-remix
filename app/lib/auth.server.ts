@@ -3,6 +3,10 @@ import jwt from "jsonwebtoken";
 import { db } from "./db.server";
 import { authLogger, securityLogger } from "./logger.server";
 import { createDefaultSubscription } from "./subscription.server";
+import { requireEnv } from "./env.server";
+import { AUTH_CONFIG } from "./config.server";
+import { AuthenticationError, handleDatabaseError } from "./errors.server";
+import { validateOrThrow, emailSchema, passwordSchema } from "./validation.server";
 
 export interface User {
   id: string;
@@ -12,6 +16,8 @@ export interface User {
 }
 
 export async function createUser(email: string, password: string, name?: string) {
+  validateOrThrow(emailSchema, email, "email");
+  validateOrThrow(passwordSchema, password, "password");
   const hashedPassword = await bcrypt.hash(password, 12);
   
   const user = await db.user.create({
@@ -30,6 +36,8 @@ export async function createUser(email: string, password: string, name?: string)
 }
 
 export async function verifyLogin(email: string, password: string) {
+  validateOrThrow(emailSchema, email, "email");
+  validateOrThrow(passwordSchema, password, "password");
   const user = await db.user.findUnique({
     where: { email },
   });
@@ -52,8 +60,8 @@ export async function verifyLogin(email: string, password: string) {
 export function createUserSession(userId: string) {
   const token = jwt.sign(
     { userId },
-    process.env.JWT_SECRET!,
-    { expiresIn: "7d" }
+    requireEnv("JWT_SECRET"),
+    { expiresIn: AUTH_CONFIG.jwtExpiration }
   );
   
   authLogger.sessionCreated(userId, 'unknown'); // We don't have email here
@@ -62,7 +70,7 @@ export function createUserSession(userId: string) {
 
 export function verifyUserSession(token: string): { userId: string } | null {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    const decoded = jwt.verify(token, requireEnv("JWT_SECRET")) as { userId: string };
     return decoded;
   } catch {
     securityLogger.invalidToken(token, 'unknown'); // We don't have IP here

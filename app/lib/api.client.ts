@@ -1,3 +1,5 @@
+import { API_CONFIG } from "./config.server";
+
 /**
  * API Client for PositiveNRG Remix App
  * 
@@ -61,9 +63,9 @@ class ApiClient {
   constructor() {
     this.config = {
       baseUrl: process.env.API_BASE_URL || 'http://localhost:8780',
-      timeout: 30000, // 30 seconds
-      retries: 3,
-      retryDelay: 1000, // 1 second
+      timeout: API_CONFIG.defaultTimeout,
+      retries: API_CONFIG.maxRetries,
+      retryDelay: API_CONFIG.retryDelay,
     };
 
     this.externalApis = {
@@ -220,7 +222,7 @@ class ApiClient {
     const startTime = Date.now();
     
     try {
-      console.log("🔌 API Client: Starting Gemini request...");
+      // Starting Gemini request
       
       // Use the provided system prompt as-is (it already contains full instructions)
       const systemPrompt = companionPersonality || "You are a positive energy AI companion. Respond in a warm, supportive, and encouraging way. Keep responses concise but meaningful. Always respond directly to what the user is saying - don't ask generic questions.";
@@ -244,7 +246,7 @@ class ApiClient {
       const response = await this.external('gemini', `/models/${this.externalApis.gemini.model}:generateContent`, {
         method: 'POST',
         body: {
-          contents: contents as any,
+          contents: contents as Array<{ role: string; parts: Array<{ text: string }> }>,
           generationConfig: {
             temperature: 0.7,
             topK: 40,
@@ -255,18 +257,18 @@ class ApiClient {
       });
 
       if (!response.success) {
-        console.error("❌ API Client: Gemini API returned error:", response.error);
+        logger.error({ error: response.error }, 'API Client: Gemini API returned error');
         throw new Error(response.error || 'Failed to generate response');
       }
 
       const aiResponse = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       
       if (!aiResponse) {
-        console.error("❌ API Client: No response text in API response:", JSON.stringify(response.data, null, 2));
+        logger.error({ responseData: response.data }, 'API Client: No response text in API response');
         throw new Error('No response generated from AI');
       }
       
-      console.log("✅ API Client: Got response, length:", aiResponse.length);
+      logger.info({ responseLength: aiResponse.length }, 'API Client: Got response successfully');
 
       const duration = Date.now() - startTime;
       aiLogger.info({
@@ -297,7 +299,7 @@ class ApiClient {
 
     // Check Gemini API
     try {
-      const response = await this.external('gemini', '/models', { timeout: 5000 });
+      const response = await this.external('gemini', '/models', { timeout: API_CONFIG.geminiTimeout });
       results.gemini = response.success;
     } catch {
       results.gemini = false;

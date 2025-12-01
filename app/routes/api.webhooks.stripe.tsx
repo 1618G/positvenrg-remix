@@ -1,6 +1,7 @@
 import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { handleStripeWebhook } from "~/lib/stripe.server";
 import Stripe from "stripe";
+import logger from "~/lib/logger.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const body = await request.text();
@@ -23,7 +24,7 @@ export async function action({ request }: ActionFunctionArgs) {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error("Webhook signature verification failed:", err);
+    logger.error({ error: err instanceof Error ? err.message : 'Unknown error' }, 'Webhook signature verification failed');
     return json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -31,7 +32,7 @@ export async function action({ request }: ActionFunctionArgs) {
     await handleStripeWebhook(event);
     return json({ received: true });
   } catch (error) {
-    console.error("Error handling webhook:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', eventType: event?.type }, 'Error handling webhook');
     return json({ error: "Webhook handler failed" }, { status: 500 });
   }
 }

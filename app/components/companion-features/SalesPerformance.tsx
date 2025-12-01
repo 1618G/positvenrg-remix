@@ -13,7 +13,7 @@ export default function SalesPerformance({ onClose }: SalesPerformanceProps) {
 
   const handleDailyDigest = () => {
     // This would integrate with Sally's knowledge base
-    console.log('Daily digest submitted:', { dailyWins, dailyChallenges, energyLevel, tomorrowGoals });
+    // Daily digest submitted
   };
 
   const getEnergyColor = (level: number) => {

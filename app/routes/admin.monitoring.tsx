@@ -1,17 +1,33 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { db } from "~/lib/db.server";
 import { getCrisisStats } from "~/lib/crisis-detection.server";
+import { getSafetyMetrics, getRecentSafetyIncidents } from "~/lib/safety.server";
 import { getKnowledgeStats } from "~/lib/knowledge-base.server";
 import { getMemoryStats } from "~/lib/memory.server";
 import { getFeatureStats } from "~/lib/companion-features.server";
+import { extractSessionFromRequest } from "~/lib/utils.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // TODO: Add authentication check for admin access
+  // Require admin authentication
+  let user;
+  try {
+    const sessionResult = await extractSessionFromRequest(request);
+    user = sessionResult.user;
+    if (user.role !== "ADMIN") {
+      return redirect("/dashboard");
+    }
+  } catch {
+    return redirect("/login");
+  }
   
   try {
     // Get crisis statistics
     const crisisStats = await getCrisisStats();
+    
+    // Get safety metrics
+    const safetyMetrics = await getSafetyMetrics();
+    const recentSafetyIncidents = await getRecentSafetyIncidents(10);
     
     // Get knowledge base statistics
     const knowledgeStats = await getKnowledgeStats();
@@ -60,6 +76,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     
     return json({
       crisisStats,
+      safetyMetrics,
+      recentSafetyIncidents,
       knowledgeStats,
       memoryStats,
       featureStats,
@@ -68,9 +86,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       companionStats
     });
   } catch (error) {
-    console.error("Error loading monitoring data:", error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Error loading monitoring data');
     return json({
       crisisStats: { totalCrises: 0, criticalCrises: 0, resolvedCrises: 0, recentCrises: [] },
+      safetyMetrics: { totalMessages: 0, flaggedMessages: 0, crisisDetections: 0, interventions: 0, averageRiskLevel: 0 },
+      recentSafetyIncidents: [],
       knowledgeStats: { totalEntries: 0, entriesByCompanion: {}, entriesByCategory: {} },
       memoryStats: { totalSummaries: 0, totalPreferences: 0, recentSummaries: [] },
       featureStats: { totalFeatures: 0, featuresByCompanion: {}, featuresByCategory: {} },

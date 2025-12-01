@@ -13,6 +13,7 @@ const knowledgeBaseMap: Record<string, string> = {
   "lucyd-knowledge.json": "Lucy'd",
   "mo-tivate-knowledge.json": "Mo Tivate",
   "nojever-knowledge.json": "Nojever",
+  "jobe-knowledge.json": "Jobe",
 };
 
 async function loadKnowledgeBases() {

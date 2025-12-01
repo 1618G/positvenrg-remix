@@ -103,3 +103,10 @@ temp/
 # Database
 *.db
 *.sqlite
+
+# Security - files containing sensitive tokens
+cookies.txt
+headers.txt
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc

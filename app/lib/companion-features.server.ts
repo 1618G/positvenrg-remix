@@ -1,4 +1,5 @@
 import { db } from "./db.server";
+import logger from "./logger.server";
 
 export interface CompanionFeature {
   id: string;
@@ -372,7 +373,7 @@ export async function getCompanionFeatures(companionId: string): Promise<Compani
       isActive: true
     }));
   } catch (error) {
-    console.error('Error getting companion features:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', companionId }, 'Error getting companion features');
     return [];
   }
 }
@@ -410,7 +411,7 @@ export async function executeCompanionFeature(
         return feature.data;
     }
   } catch (error) {
-    console.error('Error executing companion feature:', error);
+    logger.error({ error: error instanceof Error ? error.message : 'Unknown error', companionId, featureName }, 'Error executing companion feature');
     throw error;
   }
 }
